@@ -169,7 +169,7 @@
                                     <div class="flex justify-between border-b border-brand-border pb-2">
                                         <span class="text-brand-muted">Map Download</span>
                                         ${map.sspmUrl && map.sspmUrl !== '#' 
-                                            ? `<a href="${map.sspmUrl}" target="_blank" class="text-brand-accent hover:underline font-semibold flex items-center gap-1">Download .SSPM</a>`
+                                            ? `<a href="${map.sspmUrl}" target="_blank" class="text-brand-accent hover:underline font-semibold flex items-center gap-1" download>Download .SSPM</a>`
                                             : `<span class="text-brand-muted italic">No file uploaded</span>`
                                         }
                                     </div>
@@ -266,7 +266,6 @@
             });
         }
 
-        // Intercepts input actions to cache physical file configurations temporarily before execution
         function queueSspmFile(event, rank, index) {
             const file = event.target.files[0];
             if (file) {
@@ -354,7 +353,6 @@
 
                 for (let map of mapData) {
                     if (map.has_mutated) {
-                        // 1. Process bucket file attachments first if an upload was staged
                         if (pendingFiles[map.rank]) {
                             const fileObj = pendingFiles[map.rank];
                             const fileExt = fileObj.name.split('.').pop();
@@ -366,7 +364,7 @@
                                 .upload(path, fileObj, { upsert: true });
 
                             if (uploadError) {
-                                console.error(`Error uploading sspm for rank ${map.rank}:`, uploadError.message);
+                                console.error(`Error uploading file for rank ${map.rank}:`, uploadError.message);
                             } else {
                                 const { data: urlData } = supabaseClient
                                     .storage
@@ -376,16 +374,15 @@
                             }
                         }
 
-                        // 2. Perform table write updates
                         delete map.has_mutated;
                         const { error } = await supabaseClient
                             .from('maps')
                             .upsert(map);
-                        if (error) console.error("Database table write rejected:", error.message);
+                        if (error) console.error("Database save issue:", error.message);
                     }
                 }
 
-                pendingFiles = {}; // Flush runtime cache matrix once mutations execute successfully
+                pendingFiles = {}; 
                 isEditing = false;
                 btn.disabled = false;
                 btn.textContent = "Edit List";
