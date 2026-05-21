@@ -84,29 +84,30 @@
         }
         .dropdown-item:hover { background-color: #2e2e38; }
 
-        /* Modified Layout Content Grid with Sidebar Area Setup */
+        /* Adjusted Layout Structure to perfectly push the sidebar to the right edge */
         main { 
-            padding: 40px 40px; 
+            padding: 40px 20px 40px 100px; 
             display: flex; 
             justify-content: center; 
-            gap: 30px;
-            max-width: 1400px;
+            gap: 40px;
+            max-width: 1500px;
             margin: 0 auto;
         }
         .list-container { flex: 1; max-width: 1000px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* Exact Replica Placement for the Right Sidebar Red Box */
+        /* Sidebar positioning parameters */
         .sidebar-right {
             width: 320px;
             min-width: 320px;
             display: flex;
             flex-direction: column;
-            align-self: flex-start; /* Keeps it from stretching vertically */
+            align-self: flex-start;
+            margin-right: -40px;
         }
 
         .online-widget-box {
             width: 100%;
-            height: 280px;
+            height: 320px;
             background: var(--card-bg);
             border: 1px solid #222;
             border-radius: 20px;
@@ -126,37 +127,49 @@
             border-bottom: 1px solid #222;
             letter-spacing: 1px;
         }
+        /* Revamped scroll window wrapper to handle static manual scroll mechanics */
         .ticker-wrap {
             width: 100%;
             flex-grow: 1;
-            overflow: hidden;
+            overflow-y: auto;
             position: relative;
+            padding: 10px 0;
+        }
+        /* Custom scrollbar styling for the roster box */
+        .ticker-wrap::-webkit-scrollbar {
+            width: 6px;
+        }
+        .ticker-wrap::-webkit-scrollbar-thumb {
+            background: #2a2a35;
+            border-radius: 3px;
         }
         .ticker-list {
             display: flex;
             flex-direction: column;
-            position: absolute;
             width: 100%;
-            animation: tickerScroll 15s linear infinite;
-        }
-        .ticker-list:hover {
-            animation-play-state: paused;
         }
         .user-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             font-size: 0.95rem;
             font-weight: 600;
             color: #fff;
-            padding: 8px 16px;
+            padding: 8px 20px;
+            height: 32px;
+        }
+        .widget-user-pfp {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #333;
+            background: #141417;
+        }
+        .widget-user-name {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-align: center;
-            height: 24px;
-            line-height: 24px;
-        }
-        @keyframes tickerScroll {
-            0% { top: 0px; }
-            100% { transform: translateY(-50%); }
         }
 
         .map-wrapper {
@@ -310,8 +323,7 @@
             <div class="online-widget-box">
                 <div class="widget-title">Online Users</div>
                 <div class="ticker-wrap">
-                    <div class="ticker-list" id="ticker-container">
-                        </div>
+                    <div class="ticker-list" id="ticker-container"></div>
                 </div>
             </div>
         </div>
@@ -481,10 +493,19 @@
             });
         }
 
+        // Realtime Tracking Engine mapping profile photos to user row blocks uniquely
         function initOnlineTracker() {
             const ticker = document.getElementById('ticker-container');
             const cachedUser = localStorage.getItem('user_profile');
-            const username = cachedUser ? JSON.parse(cachedUser).username : ("Guest_" + Math.floor(Math.random() * 900 + 100));
+            
+            let username = "Guest_" + Math.floor(Math.random() * 900 + 100);
+            let pfpUrl = "https://cdn.discordapp.com/embed/avatars/0.png";
+
+            if (cachedUser) {
+                const parsed = JSON.parse(cachedUser);
+                username = parsed.username;
+                pfpUrl = parsed.avatar ? `https://cdn.discordapp.com/avatars/${parsed.id}/${parsed.avatar}.png` : pfpUrl;
+            }
             
             const room = supabaseClient.channel('online-presence-room', {
                 config: { presence: { key: username } }
@@ -492,24 +513,25 @@
 
             room.on('presence', { event: 'sync' }, () => {
                 const state = room.presenceState();
-                const activeUsers = Object.keys(state);
-                
-                let displayUsers = [...activeUsers, ...activeUsers, ...activeUsers, ...activeUsers];
-                if(displayUsers.length < 15) {
-                    displayUsers = [...displayUsers, ...displayUsers, ...displayUsers];
-                }
-                
                 ticker.innerHTML = "";
-                displayUsers.forEach(user => {
+                
+                // Object key processing limits usernames to exactly one continuous output instance
+                Object.keys(state).forEach(userKey => {
+                    const presenceEntries = state[userKey];
+                    const avatarMeta = (presenceEntries && presenceEntries[0]) ? presenceEntries[0].avatar_url : "https://cdn.discordapp.com/embed/avatars/0.png";
+
                     const el = document.createElement('div');
                     el.className = 'user-row';
-                    el.textContent = user;
+                    el.innerHTML = `
+                        <img src="${avatarMeta}" class="widget-user-pfp" alt="PFP">
+                        <span class="widget-user-name">${userKey}</span>
+                    `;
                     ticker.appendChild(el);
                 });
             })
             .subscribe(async (status) => {
                 if (status === 'SUBSCRIBED') {
-                    await room.track({ online_at: new Date().toISOString() });
+                    await room.track({ online_at: new Date().toISOString(), avatar_url: pfpUrl });
                 }
             });
         }
@@ -583,6 +605,8 @@
                     const user = await response.json();
                     localStorage.setItem('user_profile', JSON.stringify(user));
                     renderProfile(user);
+                    // Force refresh tracking connection once logged in to push official PFP
+                    window.location.reload();
                 } else { logout(); }
             } catch (e) { console.error(e); }
         }
