@@ -6,14 +6,17 @@
     <title>Impossible Rhythia Maps List</title>
     <style>
         :root {
-            --bg-color: #0f0f11;
-            --header-bg: #18181c;
-            --card-bg: #1e1e24;
-            --card-hover: #2a2a32;
-            --text-main: #f0f0f0;
-            --text-muted: #888890;
+            --bg-color: #0c0c0e;
+            --header-bg: #141417;
+            --card-bg: rgba(22, 22, 27, 0.85);
+            --card-hover: rgba(33, 33, 41, 0.95);
+            --text-main: #f5f5f7;
+            --text-muted: #9fa0a7;
             --accent-color: #8da4ff;
             --discord-blue: #5865F2;
+            --tag-purple: #5c3db3;
+            --tag-gold: #cc9933;
+            --green-glow: #2ecc71;
         }
 
         body {
@@ -21,17 +24,18 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
+            background-image: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0c0c0e 80%);
+            background-attachment: fixed;
         }
 
-        /* Header Layout & Navigation */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 40px;
             background-color: var(--header-bg);
-            border-bottom: 1px solid #333;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid #222;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -44,22 +48,41 @@
         }
 
         .logo {
-            width: 50px;
+            width: 45px;
             height: auto;
-            filter: drop-shadow(0 0 10px rgba(141, 164, 255, 0.4));
+            filter: drop-shadow(0 0 8px rgba(141, 164, 255, 0.4));
         }
 
         h1 {
             margin: 0;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+            font-weight: 800;
         }
 
-        /* Account / Profile System Styling */
-        .auth-container {
-            position: relative;
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
+
+        .admin-panel-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .admin-panel-btn:hover { background-color: #c0392b; }
+        .admin-panel-btn.editing { background-color: #2ecc71; }
+        .admin-panel-btn.editing:hover { background-color: #27ae60; }
+
+        .auth-container { position: relative; }
 
         .login-btn {
             background-color: var(--discord-blue);
@@ -72,146 +95,142 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.95rem;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s;
         }
-
-        .login-btn:hover {
-            background-color: #4752C4;
-        }
+        .login-btn:hover { background-color: #4752C4; }
 
         .profile-badge {
             display: flex;
             align-items: center;
             gap: 12px;
-            background-color: var(--card-bg);
+            background-color: #1e1e24;
             padding: 6px 14px 6px 6px;
             border-radius: 30px;
             cursor: pointer;
             border: 1px solid #333;
-            transition: background-color 0.2s ease;
         }
 
-        .profile-badge:hover {
-            background-color: var(--card-hover);
-        }
+        .profile-pfp { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
+        .profile-name { font-weight: 600; font-size: 0.95rem; }
 
-        .profile-pfp {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            background-color: #333;
-        }
-
-        .profile-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        /* Dropdown Menu */
         .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 52px;
-            right: 0;
-            background-color: var(--card-bg);
-            border: 1px solid #333;
-            border-radius: 6px;
-            width: 150px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: none; position: absolute; top: 52px; right: 0;
+            background-color: #1e1e24; border: 1px solid #333;
+            border-radius: 6px; width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             overflow: hidden;
         }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
+        .dropdown-menu.show { display: block; }
         .dropdown-item {
-            padding: 12px;
-            font-size: 0.9rem;
-            color: #ff6b6b;
-            cursor: pointer;
-            text-align: left;
-            background: none;
-            border: none;
-            width: 100%;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
+            padding: 12px; font-size: 0.9rem; color: #ff6b6b; cursor: pointer;
+            text-align: left; background: none; border: none; width: 100%; font-weight: 600;
         }
+        .dropdown-item:hover { background-color: #2e2e38; }
 
-        .dropdown-item:hover {
-            background-color: #2e2e38;
-        }
+        main { padding: 40px 20px; display: flex; justify-content: center; }
+        .list-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* Main Content Scaling */
-        main {
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .list-container {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        /* Exact Replica Layout of the Uploaded Level Banner */
         .list-item {
             display: flex;
-            align-items: center;
             background-color: var(--card-bg);
-            padding: 20px 25px;
-            border-radius: 6px;
-            border-left: 4px solid var(--accent-color);
-            transition: transform 0.15s ease, background-color 0.15s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px solid #222;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
         }
-
         .list-item:hover {
             transform: translateY(-2px);
+            border-color: #444;
             background-color: var(--card-hover);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
 
-        .rank {
-            font-size: 2.2rem;
+        .banner-side {
+            width: 260px;
+            min-width: 260px;
+            height: 110px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #111;
+        }
+
+        .banner-overlay-text {
+            position: absolute;
+            bottom: 8px;
+            left: 12px;
+            font-size: 1.4rem;
             font-weight: 900;
-            color: var(--accent-color);
-            min-width: 80px;
-            text-shadow: 0 0 8px rgba(141, 164, 255, 0.3);
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            max-width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .details {
+        .info-side {
+            display: flex;
+            flex-grow: 1;
+            padding: 15px 25px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-left {
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
+            gap: 6px;
         }
 
-        .map-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin: 0 0 4px 0;
+        .title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .creator {
-            color: var(--text-muted);
-            margin: 0;
-            font-size: 0.95rem;
+        .rank-num { font-size: 1.6rem; font-weight: 800; color: #fff; }
+        .map-title { font-size: 1.6rem; font-weight: 700; color: #fff; text-decoration: none; }
+        .map-title:hover { text-decoration: underline; }
+
+        .meta-row { font-size: 0.95rem; color: var(--text-muted); }
+        .mapper-name { color: #fff; font-weight: 600; }
+
+        .tags-row { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+        .tag {
+            padding: 3px 10px; border-radius: 20px; font-size: 0.75rem;
+            font-weight: 700; text-transform: uppercase;
+        }
+        .tag.gold { background-color: rgba(204, 153, 51, 0.2); color: var(--tag-gold); border: 1px solid var(--tag-gold); }
+        .tag.purple { background-color: rgba(92, 61, 179, 0.3); color: #af9eff; }
+
+        .info-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            text-align: right;
         }
 
-        .file-type {
-            background-color: #333;
-            color: var(--text-muted);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-left: 10px;
-            vertical-align: middle;
+        .stat-main { font-size: 1.5rem; font-weight: 800; color: #fff; }
+        .stat-sub { font-size: 1rem; color: #fff; font-weight: 600; }
+        .stat-points { font-size: 1.1rem; color: var(--green-glow); font-weight: 700; margin-top: 2px; }
+
+        /* Admin Controls Edit Mode Theme styling */
+        .edit-input {
+            background: #2a2a35; border: 1px solid #555; color: #fff;
+            padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; margin: 2px 0;
+            width: 100%; max-width: 250px;
         }
+        .file-label {
+            font-size: 0.75rem; background: #444; padding: 4px 8px;
+            border-radius: 4px; cursor: pointer; display: inline-block; margin-top: 5px;
+        }
+        .hidden-file { display: none; }
     </style>
 </head>
 <body>
@@ -222,138 +241,210 @@
             <h1>Impossible Rhythia Maps List</h1>
         </div>
         
-        <div class="auth-container" id="auth-section">
-            <button class="login-btn" id="login-button">
-                <span>Login with Discord</span>
-            </button>
+        <div class="header-right">
+            <button class="admin-panel-btn" id="admin-action-btn" style="display: none;">Edit List</button>
+            <div class="auth-container" id="auth-section">
+                <button class="login-btn" id="login-button">Login with Discord</button>
+            </div>
         </div>
     </header>
 
     <main>
-        <div class="list-container" id="map-list">
-            </div>
+        <div class="list-container" id="map-list"></div>
     </main>
 
     <script>
-        // CONFIGURATION VARIABLES (Replace these with your Discord App details)
-        const CLIENT_ID = '1507124123233681579'; 
-        const REDIRECT_URI = 'https://www.impossiblerhythiamaps.com/'; // Put your live Vercel/Netlify link here
+        const CLIENT_ID = 'YOUR_DISCORD_CLIENT_ID'; 
+        const REDIRECT_URI = 'YOUR_REDIRECT_URI'; 
+        const ADMIN_ID = "697113209051545640";
+
+        let isEditing = false;
+        let mapData = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             handleOAuthCallback();
             checkUserSession();
-            generatePlaceholderList();
+            loadMapData();
         });
 
-        // 1. Redirect User to Discord Login Screen
         document.getElementById('login-button').addEventListener('click', () => {
             const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
             window.location.href = oauthUrl;
         });
 
-        // 2. Extract Token from URL after Redirection
         function handleOAuthCallback() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
-
             if (accessToken) {
-                // Save token locally and clean up the address bar URL
                 localStorage.setItem('discord_token', accessToken);
                 window.history.replaceState({}, document.title, window.location.pathname);
                 fetchDiscordUserData(accessToken);
             }
         }
 
-        // 3. Fetch User Profile Data from Discord's Server
         async function fetchDiscordUserData(token) {
             try {
                 const response = await fetch('https://discord.com/api/users/@me', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                
                 if (response.ok) {
                     const user = await response.json();
                     localStorage.setItem('user_profile', JSON.stringify(user));
                     renderProfile(user);
-                } else {
-                    // Token expired or invalid
-                    logout();
-                }
-            } catch (error) {
-                console.error("Failed fetching Discord profile data:", error);
-            }
+                } else { logout(); }
+            } catch (e) { console.error(e); }
         }
 
-        // 4. Build the top right UI depending on Auth Status
         function checkUserSession() {
             const cachedUser = localStorage.getItem('user_profile');
-            const cachedToken = localStorage.getItem('discord_token');
-
-            if (cachedUser && cachedToken) {
-                renderProfile(JSON.parse(cachedUser));
-            }
+            if (cachedUser) renderProfile(JSON.parse(cachedUser));
         }
 
         function renderProfile(user) {
             const authSection = document.getElementById('auth-section');
-            
-            // Format profile avatar URL. Falls back to default asset if user doesn't have custom PFP.
-            const avatarUrl = user.avatar 
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+            const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
             authSection.innerHTML = `
                 <div class="profile-badge" id="profile-toggle">
                     <img src="${avatarUrl}" class="profile-pfp" alt="PFP">
                     <span class="profile-name">${user.username}</span>
                 </div>
-                <div class="dropdown-menu" id="dropdown-menu">
-                    <button class="dropdown-item" id="logout-button">Log Out</button>
-                </div>
+                <div class="dropdown-menu" id="dropdown-menu"><button class="dropdown-item" id="logout-button">Log Out</button></div>
             `;
 
-            // Toggle Dropdown Interface Logic
             const toggle = document.getElementById('profile-toggle');
             const menu = document.getElementById('dropdown-menu');
-            
-            toggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-            });
-
+            toggle.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); });
             document.addEventListener('click', () => menu.classList.remove('show'));
             document.getElementById('logout-button').addEventListener('click', logout);
+
+            // Access check for Admin Privileges
+            if (user.id === ADMIN_ID) {
+                const adminBtn = document.getElementById('admin-action-btn');
+                adminBtn.style.display = "block";
+                adminBtn.addEventListener('click', toggleEditMode);
+            }
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.reload();
+        function logout() { localStorage.clear(); window.location.reload(); }
+
+        // Data Management Engine
+        function loadMapData() {
+            const localSaved = localStorage.getItem('rhythia_list_data');
+            if (localSaved) {
+                mapData = JSON.parse(localSaved);
+            } else {
+                // Generate baseline structural templates if empty layout
+                const mapPrefixes = ["Open", "Silent", "Tartarus", "Void", "Quantum", "Requiem"];
+                const mapSuffixes = ["Window", "Vortex", "Endurance", "Complex", "Paradox"];
+                for (let i = 1; i <= 100; i++) {
+                    mapData.push({
+                        rank: i,
+                        name: `${mapPrefixes[i % mapPrefixes.length]} ${mapSuffixes[i % mapSuffixes.length]}`,
+                        creator: "crmsn",
+                        sspmUrl: "#",
+                        stars: (2000.00 - (i * 15)).toFixed(2),
+                        banner: "", 
+                        fps: "6000 FPS",
+                        length: "58s"
+                    });
+                }
+            }
+            renderList();
         }
 
-        // 5. Build Map List Display
-        function generatePlaceholderList() {
-            const listContainer = document.getElementById('map-list');
-            const totalMaps = 100;
-            const mapPrefixes = ["Abyssal", "Silent", "Tartarus", "Void", "Quantum", "Requiem", "Infinite", "Crimson"];
-            const mapSuffixes = ["Streams", "Vortex", "Endurance", "Complex", "Paradox", "Descent", "Sector"];
-            const fileFormats = [".sspm", ".rhm"];
+        function renderList() {
+            const container = document.getElementById('map-list');
+            container.innerHTML = "";
 
-            for (let i = 1; i <= totalMaps; i++) {
-                const randomPrefix = mapPrefixes[Math.floor(Math.random() * mapPrefixes.length)];
-                const randomSuffix = mapSuffixes[Math.floor(Math.random() * mapSuffixes.length)];
-                const mapName = `${randomPrefix} ${randomSuffix}`;
-                const format = fileFormats[Math.floor(Math.random() * fileFormats.length)];
+            mapData.forEach((map, index) => {
+                const item = document.createElement('div');
+                item.className = "list-item";
+                
+                const backgroundStyle = map.banner ? `background-image: url(${map.banner});` : `background: #16161b;`;
 
-                const listItem = document.createElement('div');
-                listItem.className = 'list-item';
-                listItem.innerHTML = `
-                    <div class="rank">#${i}</div>
-                    <div class="details">
-                        <p class="map-name">${mapName} <span class="file-type">${format}</span></p>
-                        <p class="creator">by Unknown Mapper</p>
-                    </div>
-                `;
-                listContainer.appendChild(listItem);
+                if (!isEditing) {
+                    item.innerHTML = `
+                        <div class="banner-side" style="${backgroundStyle}">
+                            <div class="banner-overlay-text">${map.name.split(' ')[0] || ''}</div>
+                        </div>
+                        <div class="info-side">
+                            <div class="info-left">
+                                <div class="title-row">
+                                    <span class="rank-num">#${map.rank}</span>
+                                    <a href="${map.sspmUrl}" class="map-title" download>${map.name}</a>
+                                    <span class="tag purple" style="background: rgba(141,164,255,0.15); color: var(--accent-color); border: 1px solid var(--accent-color)">.SSPM</span>
+                                </div>
+                                <div class="meta-row">by <span class="mapper-name">${map.creator}</span></div>
+                                <div class="tags-row">
+                                    <span class="tag gold">Alignments, Duals, & Macrobuffs</span>
+                                    <span class="tag purple">2.1</span>
+                                </div>
+                            </div>
+                            <div class="info-right">
+                                <div class="stat-main">${map.fps}</div>
+                                <div class="stat-sub">${map.length}</div>
+                                <div class="stat-points">${map.stars} pts</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Admin UI inputs for modification configuration
+                    item.innerHTML = `
+                        <div class="banner-side" style="${backgroundStyle}">
+                            <label class="file-label">Upload Banner
+                                <input type="file" class="hidden-file" accept="image/*" onchange="updateItemBanner(event, ${index})">
+                            </label>
+                        </div>
+                        <div class="info-side" style="background: #1c1c24;">
+                            <div class="info-left" style="width:100%;">
+                                <div><strong>Rank #${map.rank}</strong></div>
+                                <input type="text" class="edit-input" value="${map.name}" placeholder="Map Title" onchange="updateItemData(${index}, 'name', this.value)">
+                                <input type="text" class="edit-input" value="${map.creator}" placeholder="Creator" onchange="updateItemData(${index}, 'creator', this.value)">
+                                <input type="text" class="edit-input" value="${map.sspmUrl}" placeholder="SSPM Download Link" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
+                            </div>
+                            <div class="info-right">
+                                <input type="text" class="edit-input" style="text-align:right;" value="${map.fps}" placeholder="e.g. 6000 FPS" onchange="updateItemData(${index}, 'fps', this.value)">
+                                <input type="text" class="edit-input" style="text-align:right;" value="${map.length}" placeholder="e.g. 58s" onchange="updateItemData(${index}, 'length', this.value)">
+                                <input type="number" class="edit-input" style="text-align:right;" value="${map.stars}" placeholder="Points" onchange="updateItemData(${index}, 'stars', this.value)">
+                            </div>
+                        </div>
+                    `;
+                }
+                container.appendChild(item);
+            });
+        }
+
+        // Mutation Handlers
+        function toggleEditMode() {
+            const btn = document.getElementById('admin-action-btn');
+            if (!isEditing) {
+                isEditing = true;
+                btn.textContent = "Save Changes";
+                btn.classList.add('editing');
+                renderList();
+            } else {
+                isEditing = false;
+                btn.textContent = "Edit List";
+                btn.classList.remove('editing');
+                localStorage.setItem('rhythia_list_data', JSON.stringify(mapData));
+                renderList();
+            }
+        }
+
+        function updateItemData(index, key, val) {
+            mapData[index][key] = val;
+        }
+
+        function updateItemBanner(event, index) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mapData[index].banner = e.target.result;
+                    renderList();
+                };
+                reader.readAsDataURL(file);
             }
         }
     </script>
