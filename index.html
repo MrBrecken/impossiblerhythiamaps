@@ -84,8 +84,80 @@
         }
         .dropdown-item:hover { background-color: #2e2e38; }
 
-        main { padding: 40px 20px; display: flex; justify-content: center; }
-        .list-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 16px; }
+        /* Modified Layout Content Grid with Sidebar Area Setup */
+        main { 
+            padding: 40px 40px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .list-container { flex: 1; max-width: 1000px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* Exact Replica Placement for the Right Sidebar Red Box */
+        .sidebar-right {
+            width: 320px;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-self: flex-start; /* Keeps it from stretching vertically */
+        }
+
+        .online-widget-box {
+            width: 100%;
+            height: 280px;
+            background: var(--card-bg);
+            border: 1px solid #222;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .widget-title {
+            font-size: 0.9rem;
+            color: var(--green-glow);
+            text-transform: uppercase;
+            font-weight: 800;
+            text-align: center;
+            padding: 12px 0;
+            background: #141417;
+            border-bottom: 1px solid #222;
+            letter-spacing: 1px;
+        }
+        .ticker-wrap {
+            width: 100%;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .ticker-list {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            width: 100%;
+            animation: tickerScroll 15s linear infinite;
+        }
+        .ticker-list:hover {
+            animation-play-state: paused;
+        }
+        .user-row {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            padding: 8px 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
+            height: 24px;
+            line-height: 24px;
+        }
+        @keyframes tickerScroll {
+            0% { top: 0px; }
+            100% { transform: translateY(-50%); }
+        }
 
         .map-wrapper {
             display: flex;
@@ -233,6 +305,16 @@
 
     <main>
         <div class="list-container" id="map-list"></div>
+        
+        <div class="sidebar-right">
+            <div class="online-widget-box">
+                <div class="widget-title">Online Users</div>
+                <div class="ticker-wrap">
+                    <div class="ticker-list" id="ticker-container">
+                        </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -245,8 +327,6 @@
         const REDIRECT_URI = 'https://www.impossiblerhythiamaps.com/'; 
         const ADMIN_ID = "697113209051545640";
 
-
-        // Connect client instance using window scope destructuring
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let isEditing = false;
@@ -258,6 +338,7 @@
             checkUserSession();
             fetchLiveMapData();
             subscribeToLiveUpdates();
+            initOnlineTracker();
         });
 
         document.getElementById('login-button').addEventListener('click', () => {
@@ -325,12 +406,12 @@
                                         <span class="tag purple" style="background: rgba(141,164,255,0.15); color: var(--accent-color); border: 1px solid var(--accent-color)">.SSPM</span>
                                     </div>
                                     <div class="meta-row">by <span class="mapper-name">${map.creator}</span></div>
-                                    <div class="tags-row"><span class="tag gold">Alignments, Duals, & Macrobuffs</span></div>
+                                    <div class="tags-row"><span class="tag gold">Map Pattern</span></div>
                                 </div>
                                 <div class="info-right">
                                     <div class="stat-main">${map.starsCount}</div>
                                     <div class="stat-sub">${map.length}</div>
-                                    <div class="stat-points">${map.stars} pts</div>
+                                    <div class="stat-points">${map.stars} rp</div>
                                     <span class="toggle-arrow">${openPanels[map.rank] ? 'Show less ▴' : 'Show details ▾'}</span>
                                 </div>
                             </div>
@@ -397,6 +478,39 @@
                     `;
                 }
                 container.appendChild(wrapper);
+            });
+        }
+
+        function initOnlineTracker() {
+            const ticker = document.getElementById('ticker-container');
+            const cachedUser = localStorage.getItem('user_profile');
+            const username = cachedUser ? JSON.parse(cachedUser).username : ("Guest_" + Math.floor(Math.random() * 900 + 100));
+            
+            const room = supabaseClient.channel('online-presence-room', {
+                config: { presence: { key: username } }
+            });
+
+            room.on('presence', { event: 'sync' }, () => {
+                const state = room.presenceState();
+                const activeUsers = Object.keys(state);
+                
+                let displayUsers = [...activeUsers, ...activeUsers, ...activeUsers, ...activeUsers];
+                if(displayUsers.length < 15) {
+                    displayUsers = [...displayUsers, ...displayUsers, ...displayUsers];
+                }
+                
+                ticker.innerHTML = "";
+                displayUsers.forEach(user => {
+                    const el = document.createElement('div');
+                    el.className = 'user-row';
+                    el.textContent = user;
+                    ticker.appendChild(el);
+                });
+            })
+            .subscribe(async (status) => {
+                if (status === 'SUBSCRIBED') {
+                    await room.track({ online_at: new Date().toISOString() });
+                }
             });
         }
 
@@ -506,19 +620,17 @@
         function logout() { localStorage.clear(); window.location.reload(); }
 
         function loadFallbackTemplates() {
-            const mapPrefixes = ["Open", "Silent", "Tartarus", "Void", "Quantum", "Requiem"];
-            const mapSuffixes = ["Window", "Vortex", "Endurance", "Complex", "Paradox"];
             for (let i = 1; i <= 100; i++) {
                 mapData.push({
                     rank: i,
-                    name: `${mapPrefixes[i % mapPrefixes.length]} ${mapSuffixes[i % mapSuffixes.length]}`,
+                    name: "Map Placeholder",
                     creator: "crmsn",
                     sspmUrl: "#",
                     stars: (2000.00 - (i * 15)).toFixed(2),
                     banner: "", 
                     starsCount: "10 Stars",
                     length: "58s",
-                    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                    youtubeUrl: "https://www.youtube.com/watch?v=4RCWHNyPGeE",
                     uploadDate: "8/23/2026",
                     onlineLink: "#"
                 });
