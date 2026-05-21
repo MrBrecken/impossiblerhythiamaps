@@ -14,7 +14,7 @@
                         brand: {
                             bg: '#09090b',       /* Dark slate background */
                             surface: '#18181b',  /* Card background */
-                            panel: '#27272a',    /* Dropdown details panel */
+                            panel: '#16161b',    /* Dropdown details panel */
                             border: '#27272a',   /* Subtle structure lines */
                             accent: '#8da4ff',   /* Logo blue matching font */
                             muted: '#a1a1aa'     /* Neutral gray text */
@@ -125,9 +125,14 @@
 
             mapData.forEach((map, index) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = "bg-brand-surface border border-brand-border rounded-lg overflow-hidden transition-colors hover:bg-neutral-900/40";
+                wrapper.className = "relative bg-brand-surface border border-brand-border rounded-lg overflow-hidden transition-colors hover:bg-neutral-900/40 min-h-[110px] flex flex-col";
                 
                 const isPanelOpen = openPanels[map.rank] ? 'flex' : 'hidden';
+
+                // Setup the background image styling seamlessly using inline styles for dynamic data
+                const bgStyle = map.banner 
+                    ? `background-image: url(${map.banner}); background-size: cover; background-position: center; opacity: 0.25;` 
+                    : `background-image: radial-gradient(circle at center, #1f2937, transparent 70%); opacity: 0.5;`;
 
                 let videoEmbedUrl = "https://www.youtube.com/embed/";
                 if(map.youtubeUrl) {
@@ -138,7 +143,9 @@
 
                 if (!isEditing) {
                     wrapper.innerHTML = `
-                        <div class="flex items-center justify-between p-6 cursor-pointer select-none" onclick="togglePanel(${map.rank})">
+                        <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
+
+                        <div class="flex items-center justify-between p-6 cursor-pointer select-none relative z-10 w-full" onclick="togglePanel(${map.rank})">
                             <div class="flex flex-col gap-1">
                                 <div class="flex items-center gap-3">
                                     <span class="text-xl font-black text-brand-accent tracking-tight">#${map.rank}</span>
@@ -155,9 +162,10 @@
                                 <span class="text-[11px] text-brand-muted uppercase tracking-wider mt-2 font-semibold">${openPanels[map.rank] ? 'Close Details ▲' : 'Open Details ▼'}</span>
                             </div>
                         </div>
-                        <div class="${isPanelOpen} border-t border-brand-border bg-black/20 p-6 gap-6" id="panel-${map.rank}">
+
+                        <div class="${isPanelOpen} border-t border-brand-border bg-brand-panel/90 backdrop-blur-sm p-6 gap-6 relative z-10" id="panel-${map.rank}">
                             <div class="flex-1 max-w-[500px] aspect-video bg-black rounded-md overflow-hidden border border-brand-border">
-                                <iframe src="${videoEmbedUrl}" class="w-100 h-full w-full border-0" allowfullscreen></iframe>
+                                <iframe src="${videoEmbedUrl}" class="w-full h-full border-0" allowfullscreen></iframe>
                             </div>
                             <div class="flex-1 flex flex-col gap-4">
                                 <div class="bg-brand-surface border border-brand-border rounded-md p-4 flex flex-col gap-2 text-sm">
@@ -191,10 +199,18 @@
                     `;
                 } else {
                     wrapper.innerHTML = `
-                        <div class="p-6 bg-brand-surface">
+                        <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
+
+                        <div class="p-6 bg-brand-surface/95 backdrop-blur-sm relative z-10 h-full w-full">
                             <div class="flex gap-6 w-full">
                                 <div class="flex-1 flex flex-col gap-3">
-                                    <div class="text-sm font-bold text-brand-accent mb-1">Rank #${map.rank} Core Configuration</div>
+                                    <div class="text-sm font-bold text-brand-accent mb-1 flex items-center justify-between">
+                                        <span>Rank #${map.rank} Core Configuration</span>
+                                        <label class="text-xs bg-neutral-800 hover:bg-neutral-700 text-gray-200 px-3 py-1 rounded border border-brand-border cursor-pointer transition-colors">
+                                            Upload Background
+                                            <input type="file" class="hidden" accept="image/*" onchange="updateItemBanner(event, ${index})">
+                                        </label>
+                                    </div>
                                     <div class="flex flex-col gap-1">
                                         <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map Title</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.name}" onchange="updateItemData(${index}, 'name', this.value)">
@@ -292,6 +308,19 @@
         function updateItemData(index, key, val) {
             mapData[index][key] = val;
             mapData[index].has_mutated = true; 
+        }
+
+        function updateItemBanner(event, index) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mapData[index].banner = e.target.result;
+                    mapData[index].has_mutated = true;
+                    renderList();
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         async function toggleEditMode() {
