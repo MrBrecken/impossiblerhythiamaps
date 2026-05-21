@@ -129,7 +129,6 @@
         main { padding: 40px 20px; display: flex; justify-content: center; }
         .list-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* More circular item styling */
         .list-item {
             display: flex;
             background-color: var(--card-bg);
@@ -139,6 +138,7 @@
             position: relative;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             transition: transform 0.2s, border-color 0.2s;
+            min-height: 110px;
         }
         .list-item:hover {
             transform: translateY(-2px);
@@ -146,43 +146,39 @@
             background-color: var(--card-hover);
         }
 
-        .banner-side {
-            width: 260px;
-            min-width: 260px;
-            height: 110px;
-            background-size: contain;
-            background-repeat: no-repeat;
+        /* Full Background Map Image Placement Layer */
+        .card-bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background-size: cover;
             background-position: center;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #111;
         }
 
-        .banner-overlay-text {
-            position: absolute;
-            bottom: 8px;
-            left: 12px;
-            font-size: 1.4rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            max-width: 90%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        /* Default Layout Gradient System Styling rule */
+        .default-gradient {
+            background-image: radial-gradient(circle at center, #1f2937, transparent 70%);
+            opacity: 0.5;
+        }
+
+        .custom-banner-opacity {
+            opacity: 0.25;
         }
 
         .info-side {
             display: flex;
             flex-grow: 1;
-            padding: 15px 25px;
+            padding: 15px 35px;
             align-items: center;
             justify-content: space-between;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Centering elements properly on the left section side */
         .info-left {
             display: flex;
             flex-direction: column;
@@ -224,15 +220,15 @@
         .stat-sub { font-size: 1rem; color: #fff; font-weight: 600; }
         .stat-points { font-size: 1.1rem; color: var(--green-glow); font-weight: 700; margin-top: 2px; }
 
-        /* Admin Controls Edit Mode Theme styling */
         .edit-input {
             background: #2a2a35; border: 1px solid #555; color: #fff;
             padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; margin: 2px 0;
             width: 100%; max-width: 250px;
         }
         .file-label {
-            font-size: 0.75rem; background: #444; padding: 4px 8px;
-            border-radius: 4px; cursor: pointer; display: inline-block; margin-top: 5px;
+            font-size: 0.75rem; background: #444; padding: 6px 12px;
+            border-radius: 4px; cursor: pointer; display: inline-block; margin-bottom: 8px;
+            position: relative; z-index: 10;
         }
         .hidden-file { display: none; }
     </style>
@@ -362,14 +358,16 @@
                 const item = document.createElement('div');
                 item.className = "list-item";
                 
-                // Defaults background image fallback option to the uploaded Rhythia asset
-                const backgroundStyle = map.banner ? `background-image: url(${map.banner}); background-size: cover;` : `background-image: url('rhythia-steam-removebg-preview.png');`;
+                let bgLayerHtml = '';
+                if (map.banner) {
+                    bgLayerHtml = `<div class="card-bg-layer custom-banner-opacity" style="background-image: url(${map.banner});"></div>`;
+                } else {
+                    bgLayerHtml = `<div class="card-bg-layer default-gradient"></div>`;
+                }
 
                 if (!isEditing) {
                     item.innerHTML = `
-                        <div class="banner-side" style="${backgroundStyle}">
-                            <div class="banner-overlay-text">${map.name.split(' ')[0] || ''}</div>
-                        </div>
+                        ${bgLayerHtml}
                         <div class="info-side">
                             <div class="info-left">
                                 <div class="title-row">
@@ -391,14 +389,13 @@
                     `;
                 } else {
                     item.innerHTML = `
-                        <div class="banner-side" style="${backgroundStyle}">
-                            <label class="file-label">Upload Banner
-                                <input type="file" class="hidden-file" accept="image/*" onchange="updateItemBanner(event, ${index})">
-                            </label>
-                        </div>
-                        <div class="info-side" style="background: #1c1c24;">
+                        ${bgLayerHtml}
+                        <div class="info-side" style="background: rgba(28, 28, 36, 0.9);">
                             <div class="info-left" style="width:100%;">
                                 <div><strong>Rank #${map.rank}</strong></div>
+                                <label class="file-label">Change Banner Image
+                                    <input type="file" class="hidden-file" accept="image/*" onchange="updateItemBanner(event, ${index})">
+                                </label>
                                 <input type="text" class="edit-input" value="${map.name}" placeholder="Map Title" onchange="updateItemData(${index}, 'name', this.value)">
                                 <input type="text" class="edit-input" value="${map.creator}" placeholder="Creator" onchange="updateItemData(${index}, 'creator', this.value)">
                                 <input type="text" class="edit-input" value="${map.sspmUrl}" placeholder="SSPM Download Link" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
