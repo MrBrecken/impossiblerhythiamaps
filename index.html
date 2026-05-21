@@ -5,328 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Impossible Rhythia Maps List</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --bg-color: #0c0c0e;
-            --header-bg: #141417;
-            --card-bg: rgba(22, 22, 27, 0.85);
-            --card-hover: rgba(33, 33, 41, 0.95);
-            --panel-bg: #16161b;
-            --info-box-bg: #1e1e24;
-            --text-main: #f5f5f7;
-            --text-muted: #9fa0a7;
-            --accent-color: #8da4ff;
-            --discord-blue: #5865F2;
-            --tag-purple: #5c3db3;
-            --tag-gold: #cc9933;
-            --green-glow: #2ecc71;
-            --red-badge: #e74c3c;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#09090b',       /* Dark slate background */
+                            surface: '#18181b',  /* Card background */
+                            panel: '#27272a',    /* Dropdown details panel */
+                            border: '#27272a',   /* Subtle structure lines */
+                            accent: '#8da4ff',   /* Logo blue matching font */
+                            muted: '#a1a1aa'     /* Neutral gray text */
+                        }
+                    }
+                }
+            }
         }
-
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            background-image: radial-gradient(circle at 50% 0%, #1a1b26 0%, #0c0c0e 80%);
-            background-attachment: fixed;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 40px;
-            background-color: var(--header-bg);
-            border-bottom: 1px solid #222;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .logo { width: 45px; height: auto; filter: drop-shadow(0 0 8px rgba(141, 164, 255, 0.4)); }
-        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
-        .header-right { display: flex; align-items: center; gap: 15px; }
-
-        .admin-panel-btn {
-            background-color: #e74c3c; color: white; border: none; padding: 8px 16px;
-            border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s;
-        }
-        .admin-panel-btn:hover { background-color: #c0392b; }
-        .admin-panel-btn.editing { background-color: #2ecc71; }
-        .admin-panel-btn.editing:hover { background-color: #27ae60; }
-
-        .auth-container { position: relative; }
-        .login-btn {
-            background-color: var(--discord-blue); color: #fff; border: none; padding: 10px 18px;
-            font-weight: 600; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 8px;
-            transition: background-color 0.2s;
-        }
-        .login-btn:hover { background-color: #4752C4; }
-
-        .profile-badge {
-            display: flex; align-items: center; gap: 12px; background-color: #1e1e24;
-            padding: 6px 14px 6px 6px; border-radius: 30px; cursor: pointer; border: 1px solid #333;
-        }
-        .profile-pfp { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
-        .profile-name { font-weight: 600; font-size: 0.95rem; }
-
-        .dropdown-menu {
-            display: none; position: absolute; top: 52px; right: 0; background-color: #1e1e24;
-            border: 1px solid #333; border-radius: 6px; width: 150px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); overflow: hidden;
-        }
-        .dropdown-menu.show { display: block; }
-        .dropdown-item {
-            padding: 12px; font-size: 0.9rem; color: #ff6b6b; cursor: pointer;
-            text-align: left; background: none; border: none; width: 100%; font-weight: 600;
-        }
-        .dropdown-item:hover { background-color: #2e2e38; }
-
-        /* Adjusted Layout Structure to perfectly push the sidebar to the right edge */
-        main { 
-            padding: 40px 20px 40px 100px; 
-            display: flex; 
-            justify-content: center; 
-            gap: 40px;
-            max-width: 1500px;
-            margin: 0 auto;
-        }
-        .list-container { flex: 1; max-width: 1000px; display: flex; flex-direction: column; gap: 16px; }
-
-        /* Sidebar positioning parameters */
-        .sidebar-right {
-            width: 320px;
-            min-width: 320px;
-            display: flex;
-            flex-direction: column;
-            align-self: flex-start;
-            margin-right: -40px;
-        }
-
-        .online-widget-box {
-            width: 100%;
-            height: 320px;
-            background: var(--card-bg);
-            border: 1px solid #222;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .widget-title {
-            font-size: 0.9rem;
-            color: var(--green-glow);
-            text-transform: uppercase;
-            font-weight: 800;
-            text-align: center;
-            padding: 12px 0;
-            background: #141417;
-            border-bottom: 1px solid #222;
-            letter-spacing: 1px;
-        }
-        /* Revamped scroll window wrapper to handle static manual scroll mechanics */
-        .ticker-wrap {
-            width: 100%;
-            flex-grow: 1;
-            overflow-y: auto;
-            position: relative;
-            padding: 10px 0;
-        }
-        /* Custom scrollbar styling for the roster box */
-        .ticker-wrap::-webkit-scrollbar {
-            width: 6px;
-        }
-        .ticker-wrap::-webkit-scrollbar-thumb {
-            background: #2a2a35;
-            border-radius: 3px;
-        }
-        .ticker-list {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-        .user-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #fff;
-            padding: 8px 20px;
-            height: 32px;
-        }
-        .widget-user-pfp {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #333;
-            background: #141417;
-        }
-        .widget-user-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .map-wrapper {
-            display: flex;
-            flex-direction: column;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid #222;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .map-wrapper:hover { border-color: #444; }
-
-        .list-item {
-            display: flex;
-            position: relative;
-            min-height: 110px;
-            cursor: pointer;
-        }
-
-        .card-bg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; background-size: cover; background-position: center;
-        }
-        .default-gradient { background-image: radial-gradient(circle at center, #1f2937, transparent 70%); opacity: 0.5; }
-        .custom-banner-opacity { opacity: 0.25; }
-
-        .info-side {
-            display: flex; flex-grow: 1; padding: 15px 35px; align-items: center; justify-content: space-between; position: relative; z-index: 2;
-        }
-        .info-left { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
-        .title-row { display: flex; align-items: center; gap: 10px; }
-        .rank-num { font-size: 1.6rem; font-weight: 800; color: #fff; }
-        .map-title { font-size: 1.6rem; font-weight: 700; color: #fff; text-decoration: none; }
-        .meta-row { font-size: 0.95rem; color: var(--text-muted); }
-        .mapper-name { color: #fff; font-weight: 600; }
-        .tags-row { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
-        .tag { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .tag.gold { background-color: rgba(204, 153, 51, 0.2); color: var(--tag-gold); border: 1px solid var(--tag-gold); }
-        .tag.purple { background-color: rgba(92, 61, 179, 0.3); color: #af9eff; }
-
-        .info-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; justify-content: center; }
-        .stat-main { font-size: 1.5rem; font-weight: 800; color: #fff; }
-        .stat-sub { font-size: 1rem; color: #fff; font-weight: 600; }
-        .stat-points { font-size: 1.1rem; color: var(--green-glow); font-weight: 700; margin-top: 2px; }
-        .toggle-arrow { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
-
-        .detail-panel {
-            display: none;
-            background-color: var(--panel-bg);
-            border-top: 1px solid #222;
-            padding: 25px 35px;
-            z-index: 2;
-            position: relative;
-            gap: 30px;
-        }
-        .detail-panel.show { display: flex; }
-
-        .video-container {
-            flex: 1.4;
-            max-width: 550px;
-            aspect-ratio: 16 / 9;
-            background-color: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        }
-        .video-container iframe { width: 100%; height: 100%; border: none; }
-
-        .info-box-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .info-box {
-            background-color: var(--info-box-bg);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.95rem;
-        }
-        .info-label { color: var(--text-muted); font-weight: 500; }
-        .info-value { color: #fff; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .info-link { color: var(--accent-color); text-decoration: none; }
-        .info-link:hover { text-decoration: underline; }
-
-        .records-box {
-            background-color: var(--info-box-bg);
-            border-radius: 12px;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .records-title { font-weight: 700; font-size: 1rem; }
-        .status-badge {
-            background-color: rgba(231, 76, 60, 0.15);
-            color: var(--red-badge);
-            border: 1px solid var(--red-badge);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .edit-input {
-            background: #2a2a35; border: 1px solid #555; color: #fff;
-            padding: 5px 10px; border-radius: 6px; font-size: 0.9rem; margin: 4px 0;
-            width: 100%; box-sizing: border-box;
-        }
-        .file-label {
-            font-size: 0.75rem; background: #444; padding: 6px 12px;
-            border-radius: 4px; cursor: pointer; display: inline-block; margin-bottom: 8px;
-        }
-        .hidden-file { display: none; }
-        .admin-flex { display: flex; gap: 20px; width: 100%; }
-        .admin-col { flex: 1; display: flex; flex-direction: column; }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-brand-bg text-gray-100 antialiased font-sans">
 
-    <header>
-        <div class="header-left">
-            <img src="rhythia-steam-removebg-preview.png" alt="Rhythia Logo" class="logo">
-            <h1>Impossible Rhythia Maps List</h1>
+    <header class="sticky top-0 z-50 bg-brand-bg/95 border-b border-brand-border backdrop-blur-md px-10 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <img src="rhythia-steam-removebg-preview.png" alt="Rhythia Logo" class="w-10 h-auto">
+            <h1 class="text-xl font-bold uppercase tracking-widest text-white">Impossible Rhythia Maps List</h1>
         </div>
         
-        <div class="header-right">
-            <button class="admin-panel-btn" id="admin-action-btn" style="display: none;">Edit List</button>
-            <div class="auth-container" id="auth-section">
-                <button class="login-btn" id="login-button">Login with Discord</button>
+        <div class="flex items-center gap-4">
+            <button id="admin-action-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded border border-red-500 transition-colors">
+                Edit List
+            </button>
+            <div id="auth-section" class="relative">
+                <button id="login-button" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold text-sm px-5 py-2 rounded transition-colors flex items-center gap-2">
+                    Login with Discord
+                </button>
             </div>
         </div>
     </header>
 
-    <main>
-        <div class="list-container" id="map-list"></div>
-        
-        <div class="sidebar-right">
-            <div class="online-widget-box">
-                <div class="widget-title">Online Users</div>
-                <div class="ticker-wrap">
-                    <div class="ticker-list" id="ticker-container"></div>
-                </div>
+    <main class="max-w-[1500px] mx-auto px-10 py-10 flex gap-8 justify-center items-start">
+        <div id="map-list" class="flex-1 max-w-[1000px] flex flex-col gap-4">
             </div>
-        </div>
+        
+        <aside class="w-80 shrink-0 sticky top-24">
+            <div class="bg-brand-surface border border-brand-border rounded-lg overflow-hidden">
+                <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider text-center py-3 bg-black/20 border-b border-brand-border">
+                    Online Users
+                </div>
+                <div class="h-64 overflow-y-auto divide-y divide-brand-border" id="ticker-container">
+                    </div>
+            </div>
+        </aside>
     </main>
 
     <script>
@@ -365,7 +96,7 @@
                 .order('rank', { ascending: true });
 
             if (error) {
-                console.error("Database table issue:", error.message);
+                console.error("Database connection issue:", error.message);
                 loadFallbackTemplates(); 
             } else if (data && data.length > 0) {
                 mapData = data;
@@ -394,10 +125,9 @@
 
             mapData.forEach((map, index) => {
                 const wrapper = document.createElement('div');
-                wrapper.className = "map-wrapper";
+                wrapper.className = "bg-brand-surface border border-brand-border rounded-lg overflow-hidden transition-colors hover:bg-neutral-900/40";
                 
-                const bgLayerHtml = map.banner ? `<div class="card-bg-layer custom-banner-opacity" style="background-image: url(${map.banner});"></div>` : `<div class="card-bg-layer default-gradient"></div>`;
-                const isPanelOpen = openPanels[map.rank] ? 'show' : '';
+                const isPanelOpen = openPanels[map.rank] ? 'flex' : 'hidden';
 
                 let videoEmbedUrl = "https://www.youtube.com/embed/";
                 if(map.youtubeUrl) {
@@ -408,82 +138,102 @@
 
                 if (!isEditing) {
                     wrapper.innerHTML = `
-                        <div class="list-item" onclick="togglePanel(${map.rank})">
-                            ${bgLayerHtml}
-                            <div class="info-side">
-                                <div class="info-left">
-                                    <div class="title-row">
-                                        <span class="rank-num">#${map.rank}</span>
-                                        <span class="map-title">${map.name}</span>
-                                        <span class="tag purple" style="background: rgba(141,164,255,0.15); color: var(--accent-color); border: 1px solid var(--accent-color)">.SSPM</span>
-                                    </div>
-                                    <div class="meta-row">by <span class="mapper-name">${map.creator}</span></div>
-                                    <div class="tags-row"><span class="tag gold">Map Pattern</span></div>
+                        <div class="flex items-center justify-between p-6 cursor-pointer select-none" onclick="togglePanel(${map.rank})">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl font-black text-brand-accent tracking-tight">#${map.rank}</span>
+                                    <span class="text-lg font-bold text-white tracking-wide">${map.name}</span>
+                                    <span class="text-[10px] font-bold text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-2 py-0.5 rounded uppercase tracking-wider">.SSPM</span>
                                 </div>
-                                <div class="info-right">
-                                    <div class="stat-main">${map.starsCount}</div>
-                                    <div class="stat-sub">${map.length}</div>
-                                    <div class="stat-points">${map.stars} rp</div>
-                                    <span class="toggle-arrow">${openPanels[map.rank] ? 'Show less ▴' : 'Show details ▾'}</span>
-                                </div>
+                                <div class="text-sm text-brand-muted">by <span class="text-neutral-200 font-medium">${map.creator}</span></div>
+                                <div class="mt-2"><span class="text-[11px] font-semibold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider">Map Pattern</span></div>
+                            </div>
+                            <div class="flex flex-col items-end text-right">
+                                <div class="text-lg font-bold text-white">${map.starsCount}</div>
+                                <div class="text-sm text-brand-muted font-medium">${map.length}</div>
+                                <div class="text-sm font-bold text-emerald-400 mt-1">${map.stars} rp</div>
+                                <span class="text-[11px] text-brand-muted uppercase tracking-wider mt-2 font-semibold">${openPanels[map.rank] ? 'Close Details ▲' : 'Open Details ▼'}</span>
                             </div>
                         </div>
-                        <div class="detail-panel ${isPanelOpen}" id="panel-${map.rank}">
-                            <div class="video-container">
-                                <iframe src="${videoEmbedUrl}" allowfullscreen></iframe>
+                        <div class="${isPanelOpen} border-t border-brand-border bg-black/20 p-6 gap-6" id="panel-${map.rank}">
+                            <div class="flex-1 max-w-[500px] aspect-video bg-black rounded-md overflow-hidden border border-brand-border">
+                                <iframe src="${videoEmbedUrl}" class="w-100 h-full w-full border-0" allowfullscreen></iframe>
                             </div>
-                            <div class="info-box-container">
-                                <div class="info-box">
-                                    <div class="info-row">
-                                        <span class="info-label">Map Download</span>
-                                        <span class="info-value"><a href="${map.sspmUrl}" class="info-link" download>SSPM</a></span>
+                            <div class="flex-1 flex flex-col gap-4">
+                                <div class="bg-brand-surface border border-brand-border rounded-md p-4 flex flex-col gap-2 text-sm">
+                                    <div class="flex justify-between border-b border-brand-border pb-2">
+                                        <span class="text-brand-muted">Map Download</span>
+                                        <a href="${map.sspmUrl}" class="text-brand-accent hover:underline font-semibold" download>SSPM</a>
                                     </div>
-                                    <div class="info-row">
-                                        <span class="info-label">Creators</span>
-                                        <span class="info-value">${map.creator}</span>
+                                    <div class="flex justify-between border-b border-brand-border pb-2">
+                                        <span class="text-brand-muted">Creators</span>
+                                        <span class="text-white font-semibold">${map.creator}</span>
                                     </div>
-                                    <div class="info-row">
-                                        <span class="info-label">Length</span>
-                                        <span class="info-value">${map.length}</span>
+                                    <div class="flex justify-between border-b border-brand-border pb-2">
+                                        <span class="text-brand-muted">Length</span>
+                                        <span class="text-white font-semibold">${map.length}</span>
                                     </div>
-                                    <div class="info-row">
-                                        <span class="info-label">Date Uploaded</span>
-                                        <span class="info-value">${map.uploadDate || 'N/A'}</span>
+                                    <div class="flex justify-between border-b border-brand-border pb-2">
+                                        <span class="text-brand-muted">Date Uploaded</span>
+                                        <span class="text-white font-semibold">${map.uploadDate || 'N/A'}</span>
                                     </div>
-                                    <div class="info-row">
-                                        <span class="info-label">Online Link</span>
-                                        <span class="info-value"><a href="${map.onlineLink || '#'}" target="_blank" class="info-link">Link</a></span>
+                                    <div class="flex justify-between">
+                                        <span class="text-brand-muted">Online Link</span>
+                                        <a href="${map.onlineLink || '#'}" target="_blank" class="text-brand-accent hover:underline font-semibold">Link</a>
                                     </div>
                                 </div>
-                                <div class="records-box">
-                                    <span class="records-title">Records</span>
-                                    <span class="status-badge">Uncleared</span>
+                                <div class="bg-brand-surface border border-brand-border rounded-md px-4 py-3 flex justify-between items-center text-sm">
+                                    <span class="font-bold text-white tracking-wide">Records</span>
+                                    <span class="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full uppercase tracking-wider">Uncleared</span>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else {
                     wrapper.innerHTML = `
-                        ${bgLayerHtml}
-                        <div class="info-side" style="background: rgba(28, 28, 36, 0.98); padding: 25px 35px;">
-                            <div class="admin-flex">
-                                <div class="admin-col">
-                                    <div><strong>Rank #${map.rank} Core Configuration</strong></div>
-                                    <label class="file-label">Change Background Image
-                                        <input type="file" class="hidden-file" accept="image/*" onchange="updateItemBanner(event, ${index})">
-                                    </label>
-                                    <input type="text" class="edit-input" value="${map.name}" placeholder="Map Title" onchange="updateItemData(${index}, 'name', this.value)">
-                                    <input type="text" class="edit-input" value="${map.creator}" placeholder="Creator Name" onchange="updateItemData(${index}, 'creator', this.value)">
-                                    <input type="text" class="edit-input" value="${map.sspmUrl}" placeholder="SSPM File Link" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
-                                    <input type="text" class="edit-input" value="${map.uploadDate || ''}" placeholder="Upload Date (e.g., 8/23/2026)" onchange="updateItemData(${index}, 'uploadDate', this.value)">
+                        <div class="p-6 bg-brand-surface">
+                            <div class="flex gap-6 w-full">
+                                <div class="flex-1 flex flex-col gap-3">
+                                    <div class="text-sm font-bold text-brand-accent mb-1">Rank #${map.rank} Core Configuration</div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map Title</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.name}" onchange="updateItemData(${index}, 'name', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Creator Name</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.creator}" onchange="updateItemData(${index}, 'creator', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">SSPM Link</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.sspmUrl}" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Upload Date</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.uploadDate || ''}" onchange="updateItemData(${index}, 'uploadDate', this.value)">
+                                    </div>
                                 </div>
-                                <div class="admin-col">
-                                    <div><strong>Panel Dropdown Settings</strong></div>
-                                    <input type="text" class="edit-input" value="${map.youtubeUrl || ''}" placeholder="YouTube Video URL" onchange="updateItemData(${index}, 'youtubeUrl', this.value)">
-                                    <input type="text" class="edit-input" value="${map.onlineLink || ''}" placeholder="Map Online Web Link" onchange="updateItemData(${index}, 'onlineLink', this.value)">
-                                    <input type="text" class="edit-input" value="${map.starsCount}" placeholder="Display Stars (e.g. 10 Stars)" onchange="updateItemData(${index}, 'starsCount', this.value)">
-                                    <input type="text" class="edit-input" value="${map.length}" placeholder="Duration Length (e.g. 58s)" onchange="updateItemData(${index}, 'length', this.value)">
-                                    <input type="number" class="edit-input" value="${map.stars}" placeholder="List Points" onchange="updateItemData(${index}, 'stars', this.value)">
+                                <div class="flex-1 flex flex-col gap-3">
+                                    <div class="text-sm font-bold text-brand-accent mb-1">Panel Dropdown Settings</div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">YouTube URL</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.youtubeUrl || ''}" onchange="updateItemData(${index}, 'youtubeUrl', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Online Web Link</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.onlineLink || ''}" onchange="updateItemData(${index}, 'onlineLink', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Display Stars</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.starsCount}" onchange="updateItemData(${index}, 'starsCount', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Duration Length</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.length}" onchange="updateItemData(${index}, 'length', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">List RP Points</label>
+                                        <input type="number" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.stars}" onchange="updateItemData(${index}, 'stars', this.value)">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -493,7 +243,6 @@
             });
         }
 
-        // Realtime Tracking Engine mapping profile photos to user row blocks uniquely
         function initOnlineTracker() {
             const ticker = document.getElementById('ticker-container');
             const cachedUser = localStorage.getItem('user_profile');
@@ -515,16 +264,15 @@
                 const state = room.presenceState();
                 ticker.innerHTML = "";
                 
-                // Object key processing limits usernames to exactly one continuous output instance
                 Object.keys(state).forEach(userKey => {
                     const presenceEntries = state[userKey];
                     const avatarMeta = (presenceEntries && presenceEntries[0]) ? presenceEntries[0].avatar_url : "https://cdn.discordapp.com/embed/avatars/0.png";
 
                     const el = document.createElement('div');
-                    el.className = 'user-row';
+                    el.className = 'flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white';
                     el.innerHTML = `
-                        <img src="${avatarMeta}" class="widget-user-pfp" alt="PFP">
-                        <span class="widget-user-name">${userKey}</span>
+                        <img src="${avatarMeta}" class="w-7 h-7 rounded-full object-cover border border-brand-border bg-neutral-950" alt="PFP">
+                        <span class="truncate">${userKey}</span>
                     `;
                     ticker.appendChild(el);
                 });
@@ -546,28 +294,15 @@
             mapData[index].has_mutated = true; 
         }
 
-        function updateItemBanner(event, index) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    mapData[index].banner = e.target.result;
-                    mapData[index].has_mutated = true;
-                    renderList();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
         async function toggleEditMode() {
             const btn = document.getElementById('admin-action-btn');
             if (!isEditing) {
                 isEditing = true;
                 btn.textContent = "Sync Changes Globally";
-                btn.classList.add('editing');
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-4 py-2 rounded border border-emerald-500 transition-colors";
                 renderList();
             } else {
-                btn.textContent = "Saving to Database...";
+                btn.textContent = "Saving...";
                 btn.disabled = true;
 
                 for (let map of mapData) {
@@ -576,14 +311,14 @@
                         const { error } = await supabaseClient
                             .from('maps')
                             .upsert(map);
-                        if (error) console.error("Database save issue:", error.message);
+                        if (error) console.error("Database error:", error.message);
                     }
                 }
 
                 isEditing = false;
                 btn.disabled = false;
                 btn.textContent = "Edit List";
-                btn.classList.remove('editing');
+                btn.className = "bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded border border-red-500 transition-colors";
                 renderList();
             }
         }
@@ -605,7 +340,6 @@
                     const user = await response.json();
                     localStorage.setItem('user_profile', JSON.stringify(user));
                     renderProfile(user);
-                    // Force refresh tracking connection once logged in to push official PFP
                     window.location.reload();
                 } else { logout(); }
             } catch (e) { console.error(e); }
@@ -621,22 +355,24 @@
             const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
             authSection.innerHTML = `
-                <div class="profile-badge" id="profile-toggle">
-                    <img src="${avatarUrl}" class="profile-pfp" alt="PFP">
-                    <span class="profile-name">${user.username}</span>
+                <div class="flex items-center gap-3 bg-brand-surface border border-brand-border px-4 py-1.5 rounded-full cursor-pointer hover:bg-neutral-800 transition-colors" id="profile-toggle">
+                    <img src="${avatarUrl}" class="w-7 h-7 rounded-full object-cover" alt="PFP">
+                    <span class="text-sm font-semibold text-white">${user.username}</span>
                 </div>
-                <div class="dropdown-menu" id="dropdown-menu"><button class="dropdown-item" id="logout-button">Log Out</button></div>
+                <div class="hidden absolute top-12 right-0 bg-brand-surface border border-brand-border rounded shadow-xl overflow-hidden w-36" id="dropdown-menu">
+                    <button class="w-full text-left px-4 py-2.5 text-sm font-bold text-red-400 hover:bg-neutral-800 transition-colors" id="logout-button">Log Out</button>
+                </div>
             `;
 
             const toggle = document.getElementById('profile-toggle');
             const menu = document.getElementById('dropdown-menu');
-            toggle.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); });
-            document.addEventListener('click', () => menu.classList.remove('show'));
+            toggle.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); });
+            document.addEventListener('click', () => menu.classList.add('hidden'));
             document.getElementById('logout-button').addEventListener('click', logout);
 
             if (user.id === ADMIN_ID) {
                 const adminBtn = document.getElementById('admin-action-btn');
-                adminBtn.style.display = "block";
+                adminBtn.classList.remove('hidden');
                 adminBtn.addEventListener('click', toggleEditMode);
             }
         }
