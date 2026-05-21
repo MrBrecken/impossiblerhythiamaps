@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impossible Rhythia Maps List</title>
+    <style>
+        :root {
+            --bg-color: #0f0f11;
+            --header-bg: #18181c;
+            --card-bg: #1e1e24;
+            --card-hover: #2a2a32;
+            --text-main: #f0f0f0;
+            --text-muted: #888890;
+            --accent-color: #8da4ff; /* Matches the blue in the logo */
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Header Styling */
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px 30px;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(141, 164, 255, 0.4));
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        /* Main Content Styling */
+        main {
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .list-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* List Item Styling */
+        .list-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            transform: translateY(-2px);
+            background-color: var(--card-hover);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .rank {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--accent-color);
+            min-width: 80px;
+            text-shadow: 0 0 8px rgba(141, 164, 255, 0.3);
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .map-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .creator {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .file-type {
+            background-color: #333;
+            color: var(--text-muted);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="rhythia-steam-removebg-preview.png" alt="Rhythia Logo" class="logo">
+        <h1>Impossible Rhythia Maps List</h1>
+    </header>
+
+    <main>
+        <div class="list-container" id="map-list">
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const listContainer = document.getElementById('map-list');
+            const totalMaps = 100;
+
+            // Arrays to randomize placeholder data slightly
+            const mapPrefixes = ["Abyssal", "Silent", "Tartarus", "Void", "Quantum", "Requiem", "Infinite", "Crimson"];
+            const mapSuffixes = ["Streams", "Vortex", "Endurance", "Complex", "Paradox", "Descent", "Sector"];
+            const fileFormats = [".sspm", ".rhm"];
+
+            for (let i = 1; i <= totalMaps; i++) {
+                // Generate random placeholder names
+                const randomPrefix = mapPrefixes[Math.floor(Math.random() * mapPrefixes.length)];
+                const randomSuffix = mapSuffixes[Math.floor(Math.random() * mapSuffixes.length)];
+                const mapName = `${randomPrefix} ${randomSuffix}`;
+                const format = fileFormats[Math.floor(Math.random() * fileFormats.length)];
+
+                // Create the list item container
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+
+                // Inject the HTML structure for each card
+                listItem.innerHTML = `
+                    <div class="rank">#${i}</div>
+                    <div class="details">
+                        <p class="map-name">${mapName} <span class="file-type">${format}</span></p>
+                        <p class="creator">by Unknown Mapper</p>
+                    </div>
+                `;
+
+                // Add to the main container
+                listContainer.appendChild(listItem);
+            }
+        });
+    </script>
+
+</body>
+</html>
