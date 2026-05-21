@@ -445,6 +445,12 @@
             }
         }
 
+        document.addEventListener("DOMContentLoaded", () => {
+            // Force standard dynamic height alignments on text wrapper blocks
+            const scrollbox = document.getElementById('ticker-container');
+            if(scrollbox) scrollbox.style.height = "320px";
+        });
+
         function logout() { localStorage.clear(); window.location.reload(); }
 
         function loadFallbackTemplates() {
@@ -454,7 +460,7 @@
                     name: "Map Placeholder",
                     creator: "crmsn",
                     sspmUrl: "#",
-                    stars: (2000.00 - (i * 15)).toFixed(2),
+                    stars: 100.00, 
                     banner: "", 
                     starsCount: "10 Stars",
                     length: "58s",
