@@ -129,11 +129,11 @@
         main { padding: 40px 20px; display: flex; justify-content: center; }
         .list-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* Exact Replica Layout of the Uploaded Level Banner */
+        /* More circular item styling */
         .list-item {
             display: flex;
             background-color: var(--card-bg);
-            border-radius: 8px;
+            border-radius: 20px;
             border: 1px solid #222;
             overflow: hidden;
             position: relative;
@@ -150,7 +150,8 @@
             width: 260px;
             min-width: 260px;
             height: 110px;
-            background-size: cover;
+            background-size: contain;
+            background-repeat: no-repeat;
             background-position: center;
             position: relative;
             display: flex;
@@ -181,10 +182,12 @@
             justify-content: space-between;
         }
 
+        /* Centering elements properly on the left section side */
         .info-left {
             display: flex;
             flex-direction: column;
             gap: 6px;
+            justify-content: center;
         }
 
         .title-row {
@@ -214,6 +217,7 @@
             align-items: flex-end;
             gap: 4px;
             text-align: right;
+            justify-content: center;
         }
 
         .stat-main { font-size: 1.5rem; font-weight: 800; color: #fff; }
@@ -318,7 +322,6 @@
             document.addEventListener('click', () => menu.classList.remove('show'));
             document.getElementById('logout-button').addEventListener('click', logout);
 
-            // Access check for Admin Privileges
             if (user.id === ADMIN_ID) {
                 const adminBtn = document.getElementById('admin-action-btn');
                 adminBtn.style.display = "block";
@@ -328,13 +331,11 @@
 
         function logout() { localStorage.clear(); window.location.reload(); }
 
-        // Data Management Engine
         function loadMapData() {
             const localSaved = localStorage.getItem('rhythia_list_data');
             if (localSaved) {
                 mapData = JSON.parse(localSaved);
             } else {
-                // Generate baseline structural templates if empty layout
                 const mapPrefixes = ["Open", "Silent", "Tartarus", "Void", "Quantum", "Requiem"];
                 const mapSuffixes = ["Window", "Vortex", "Endurance", "Complex", "Paradox"];
                 for (let i = 1; i <= 100; i++) {
@@ -345,7 +346,7 @@
                         sspmUrl: "#",
                         stars: (2000.00 - (i * 15)).toFixed(2),
                         banner: "", 
-                        fps: "6000 FPS",
+                        starsCount: "10 Stars",
                         length: "58s"
                     });
                 }
@@ -361,7 +362,8 @@
                 const item = document.createElement('div');
                 item.className = "list-item";
                 
-                const backgroundStyle = map.banner ? `background-image: url(${map.banner});` : `background: #16161b;`;
+                // Defaults background image fallback option to the uploaded Rhythia asset
+                const backgroundStyle = map.banner ? `background-image: url(${map.banner}); background-size: cover;` : `background-image: url('rhythia-steam-removebg-preview.png');`;
 
                 if (!isEditing) {
                     item.innerHTML = `
@@ -378,18 +380,16 @@
                                 <div class="meta-row">by <span class="mapper-name">${map.creator}</span></div>
                                 <div class="tags-row">
                                     <span class="tag gold">Alignments, Duals, & Macrobuffs</span>
-                                    <span class="tag purple">2.1</span>
                                 </div>
                             </div>
                             <div class="info-right">
-                                <div class="stat-main">${map.fps}</div>
+                                <div class="stat-main">${map.starsCount}</div>
                                 <div class="stat-sub">${map.length}</div>
                                 <div class="stat-points">${map.stars} pts</div>
                             </div>
                         </div>
                     `;
                 } else {
-                    // Admin UI inputs for modification configuration
                     item.innerHTML = `
                         <div class="banner-side" style="${backgroundStyle}">
                             <label class="file-label">Upload Banner
@@ -404,7 +404,7 @@
                                 <input type="text" class="edit-input" value="${map.sspmUrl}" placeholder="SSPM Download Link" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
                             </div>
                             <div class="info-right">
-                                <input type="text" class="edit-input" style="text-align:right;" value="${map.fps}" placeholder="e.g. 6000 FPS" onchange="updateItemData(${index}, 'fps', this.value)">
+                                <input type="text" class="edit-input" style="text-align:right;" value="${map.starsCount}" placeholder="e.g. 10 Stars" onchange="updateItemData(${index}, 'starsCount', this.value)">
                                 <input type="text" class="edit-input" style="text-align:right;" value="${map.length}" placeholder="e.g. 58s" onchange="updateItemData(${index}, 'length', this.value)">
                                 <input type="number" class="edit-input" style="text-align:right;" value="${map.stars}" placeholder="Points" onchange="updateItemData(${index}, 'stars', this.value)">
                             </div>
@@ -415,7 +415,6 @@
             });
         }
 
-        // Mutation Handlers
         function toggleEditMode() {
             const btn = document.getElementById('admin-action-btn');
             if (!isEditing) {
