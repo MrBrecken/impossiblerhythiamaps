@@ -151,7 +151,7 @@
                                     <span class="text-[10px] font-bold text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-2 py-0.5 rounded uppercase tracking-wider">.SSPM</span>
                                 </div>
                                 <div class="text-sm text-brand-muted">by <span class="text-neutral-200 font-medium">${map.creator}</span></div>
-                                <div class="mt-2"><span class="text-[11px] font-semibold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider">Map Pattern</span></div>
+                                <div class="mt-2"><span class="text-[11px] font-semibold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider">${map.pattern || 'Map Pattern'}</span></div>
                             </div>
                             <div class="flex flex-col items-end text-right">
                                 <div class="text-lg font-bold text-white">${map.starsCount}</div>
@@ -237,6 +237,10 @@
                                 </div>
                                 <div class="flex-1 flex flex-col gap-3">
                                     <div class="text-sm font-bold text-brand-accent mb-1">Panel Dropdown Settings</div>
+                                    <div class="flex flex-col gap-1">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map Pattern Badge Text</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.pattern || 'Map Pattern'}" placeholder="e.g., Alignments & Jumps" onchange="updateItemData(${index}, 'pattern', this.value)">
+                                    </div>
                                     <div class="flex flex-col gap-1">
                                         <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">YouTube URL</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.youtubeUrl || ''}" onchange="updateItemData(${index}, 'youtubeUrl', this.value)">
@@ -446,7 +450,6 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Force standard dynamic height alignments on text wrapper blocks
             const scrollbox = document.getElementById('ticker-container');
             if(scrollbox) scrollbox.style.height = "320px";
         });
@@ -466,7 +469,8 @@
                     length: "58s",
                     youtubeUrl: "https://www.youtube.com/watch?v=4RCWHNyPGeE",
                     uploadDate: "8/23/2026",
-                    onlineLink: "#"
+                    onlineLink: "#",
+                    pattern: "Map Pattern" // Default value added to fallback loops seamlessly
                 });
             }
             renderList();
