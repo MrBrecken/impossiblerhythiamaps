@@ -87,7 +87,6 @@
         main { padding: 40px 20px; display: flex; justify-content: center; }
         .list-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* Map Card Wrapper */
         .map-wrapper {
             display: flex;
             flex-direction: column;
@@ -133,7 +132,6 @@
         .stat-points { font-size: 1.1rem; color: var(--green-glow); font-weight: 700; margin-top: 2px; }
         .toggle-arrow { color: var(--text-muted); font-size: 0.85rem; margin-top: 4px; }
 
-        /* Exact Replica Layout of the Dropdown Detail Panel */
         .detail-panel {
             display: none;
             background-color: var(--panel-bg);
@@ -203,7 +201,6 @@
             text-transform: uppercase;
         }
 
-        /* Admin Controls Edit Fields */
         .edit-input {
             background: #2a2a35; border: 1px solid #555; color: #fff;
             padding: 5px 10px; border-radius: 6px; font-size: 0.9rem; margin: 4px 0;
@@ -239,19 +236,22 @@
     </main>
 
     <script>
-        // --- DATABASE & AUTH CONFIGURATION ---
+        // ==========================================
+        //         CONFIG VARIATION PARAMETERS
+        // ==========================================
         const SUPABASE_URL = 'https://gspsmpaunapxmhtngkiz.supabase.co'; 
         const SUPABASE_ANON_KEY = 'sb_publishable_OziaNf0aqM2iZeFqMuMKqQ_Pby5qzbR';
         const CLIENT_ID = '1507124123233681579'; 
         const REDIRECT_URI = 'https://www.impossiblerhythiamaps.com/'; 
         const ADMIN_ID = "697113209051545640";
 
-        // Initialize Supabase Connection Client
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Connect client instance using window scope destructuring
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let isEditing = false;
         let mapData = [];
-        let openPanels = {}; // Tracks which dropdown containers are toggled expanded
+        let openPanels = {}; 
 
         document.addEventListener("DOMContentLoaded", () => {
             handleOAuthCallback();
@@ -260,16 +260,20 @@
             subscribeToLiveUpdates();
         });
 
-        // 1. Live Realtime Synchronization Engine
+        document.getElementById('login-button').addEventListener('click', () => {
+            const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+            window.location.href = oauthUrl;
+        });
+
         async function fetchLiveMapData() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('maps')
                 .select('*')
                 .order('rank', { ascending: true });
 
             if (error) {
-                console.error("Error connecting to database:", error.message);
-                loadFallbackTemplates(); // Fallback grid structure if DB table isn't created yet
+                console.error("Database table issue:", error.message);
+                loadFallbackTemplates(); 
             } else if (data && data.length > 0) {
                 mapData = data;
                 renderList();
@@ -279,9 +283,8 @@
         }
 
         function subscribeToLiveUpdates() {
-            supabase.channel('custom-all-channel')
+            supabaseClient.channel('custom-all-channel')
             .on('postgres_changes', { event: '*', filter: 'table=eq.maps' }, (payload) => {
-                // If another client modifications land, intercept and update array matrix state dynamically
                 const updatedRow = payload.new;
                 const index = mapData.findIndex(m => m.id === updatedRow.id || m.rank === updatedRow.rank);
                 if (index !== -1) {
@@ -292,7 +295,6 @@
             .subscribe();
         }
 
-        // 2. Interface UI Renderer Grid Engine
         function renderList() {
             const container = document.getElementById('map-list');
             container.innerHTML = "";
@@ -301,11 +303,9 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = "map-wrapper";
                 
-                const backgroundStyle = map.banner ? `background-image: url(${map.banner}); background-size: cover;` : `background-image: url('rhythia-steam-removebg-preview.png');`;
                 const bgLayerHtml = map.banner ? `<div class="card-bg-layer custom-banner-opacity" style="background-image: url(${map.banner});"></div>` : `<div class="card-bg-layer default-gradient"></div>`;
                 const isPanelOpen = openPanels[map.rank] ? 'show' : '';
 
-                // Extract embedded video container ID parameter clean reference lookup mapping values
                 let videoEmbedUrl = "https://www.youtube.com/embed/";
                 if(map.youtubeUrl) {
                     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -370,8 +370,8 @@
                         </div>
                     `;
                 } else {
-                    // Admin UI inputs for complete layout modification control access setup configuration adjustments
                     wrapper.innerHTML = `
+                        ${bgLayerHtml}
                         <div class="info-side" style="background: rgba(28, 28, 36, 0.98); padding: 25px 35px;">
                             <div class="admin-flex">
                                 <div class="admin-col">
@@ -407,7 +407,7 @@
 
         function updateItemData(index, key, val) {
             mapData[index][key] = val;
-            mapData[index].has_mutated = true; // Flag record to optimize mass saving execution payloads
+            mapData[index].has_mutated = true; 
         }
 
         function updateItemBanner(event, index) {
@@ -434,14 +434,13 @@
                 btn.textContent = "Saving to Database...";
                 btn.disabled = true;
 
-                // Bulk query batch updates out to live Supabase backend instances
                 for (let map of mapData) {
                     if (map.has_mutated) {
                         delete map.has_mutated;
-                        const { error } = await supabase
+                        const { error } = await supabaseClient
                             .from('maps')
                             .upsert(map);
-                        if (error) console.error("Database save mutation rejected:", error.message);
+                        if (error) console.error("Database save issue:", error.message);
                     }
                 }
 
@@ -452,12 +451,6 @@
                 renderList();
             }
         }
-
-        // --- DISCORD AUTH MECHANISM SECTION ENGINE ---
-        document.getElementById('login-button').addEventListener('click', () => {
-            const oauthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
-            window.location.href = oauthUrl;
-        });
 
         function handleOAuthCallback() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
@@ -512,7 +505,6 @@
 
         function logout() { localStorage.clear(); window.location.reload(); }
 
-        // Initial Generation Backups if DB Table is empty
         function loadFallbackTemplates() {
             const mapPrefixes = ["Open", "Silent", "Tartarus", "Void", "Quantum", "Requiem"];
             const mapSuffixes = ["Window", "Vortex", "Endurance", "Complex", "Paradox"];
@@ -536,9 +528,8 @@
 
         async function generateInitialDatabaseEntries() {
             loadFallbackTemplates();
-            // Automatically seed database with rows if empty schema instance detected
             for(let map of mapData) {
-                await supabase.from('maps').insert(map);
+                await supabaseClient.from('maps').insert(map);
             }
         }
     </script>
