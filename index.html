@@ -75,6 +75,7 @@
         let isEditing = false;
         let mapData = [];
         let openPanels = {}; 
+        let pendingFiles = {}; // Stores files temporarily in memory before global sync button execution
 
         document.addEventListener("DOMContentLoaded", () => {
             handleOAuthCallback();
@@ -128,8 +129,6 @@
                 wrapper.className = "relative bg-brand-surface border border-brand-border rounded-lg overflow-hidden transition-colors hover:bg-neutral-900/40 min-h-[110px] flex flex-col";
                 
                 const isPanelOpen = openPanels[map.rank] ? 'flex' : 'hidden';
-
-                // Setup the background image styling seamlessly using inline styles for dynamic data
                 const bgStyle = map.banner 
                     ? `background-image: url(${map.banner}); background-size: cover; background-position: center; opacity: 0.25;` 
                     : `background-image: radial-gradient(circle at center, #1f2937, transparent 70%); opacity: 0.5;`;
@@ -144,7 +143,6 @@
                 if (!isEditing) {
                     wrapper.innerHTML = `
                         <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
-
                         <div class="flex items-center justify-between p-6 cursor-pointer select-none relative z-10 w-full" onclick="togglePanel(${map.rank})">
                             <div class="flex flex-col gap-1">
                                 <div class="flex items-center gap-3">
@@ -162,7 +160,6 @@
                                 <span class="text-[11px] text-brand-muted uppercase tracking-wider mt-2 font-semibold">${openPanels[map.rank] ? 'Close Details ▲' : 'Open Details ▼'}</span>
                             </div>
                         </div>
-
                         <div class="${isPanelOpen} border-t border-brand-border bg-brand-panel/90 backdrop-blur-sm p-6 gap-6 relative z-10" id="panel-${map.rank}">
                             <div class="flex-1 max-w-[500px] aspect-video bg-black rounded-md overflow-hidden border border-brand-border">
                                 <iframe src="${videoEmbedUrl}" class="w-full h-full border-0" allowfullscreen></iframe>
@@ -171,7 +168,10 @@
                                 <div class="bg-brand-surface border border-brand-border rounded-md p-4 flex flex-col gap-2 text-sm">
                                     <div class="flex justify-between border-b border-brand-border pb-2">
                                         <span class="text-brand-muted">Map Download</span>
-                                        <a href="${map.sspmUrl}" class="text-brand-accent hover:underline font-semibold" download>SSPM</a>
+                                        ${map.sspmUrl && map.sspmUrl !== '#' 
+                                            ? `<a href="${map.sspmUrl}" target="_blank" class="text-brand-accent hover:underline font-semibold flex items-center gap-1">Download .SSPM</a>`
+                                            : `<span class="text-brand-muted italic">No file uploaded</span>`
+                                        }
                                     </div>
                                     <div class="flex justify-between border-b border-brand-border pb-2">
                                         <span class="text-brand-muted">Creators</span>
@@ -198,9 +198,10 @@
                         </div>
                     `;
                 } else {
+                    const statusText = pendingFiles[map.rank] ? `✓ File Selected (${pendingFiles[map.rank].name})` : (map.sspmUrl && map.sspmUrl !== '#' ? '✓ File Stored' : 'No file chosen');
+                    
                     wrapper.innerHTML = `
                         <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
-
                         <div class="p-6 bg-brand-surface/95 backdrop-blur-sm relative z-10 h-full w-full">
                             <div class="flex gap-6 w-full">
                                 <div class="flex-1 flex flex-col gap-3">
@@ -220,8 +221,14 @@
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.creator}" onchange="updateItemData(${index}, 'creator', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">SSPM Link</label>
-                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.sspmUrl}" onchange="updateItemData(${index}, 'sspmUrl', this.value)">
+                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map File (.SSPM)</label>
+                                        <div class="flex items-center gap-3">
+                                            <label class="text-xs bg-brand-accent hover:bg-opacity-80 text-neutral-950 font-bold px-3 py-1.5 rounded cursor-pointer transition-all">
+                                                Choose File
+                                                <input type="file" class="hidden" accept=".sspm" onchange="queueSspmFile(event, ${map.rank}, ${index})">
+                                            </label>
+                                            <span class="text-xs ${pendingFiles[map.rank] ? 'text-emerald-400' : 'text-brand-muted'} font-medium truncate max-w-[200px]" id="status-${map.rank}">${statusText}</span>
+                                        </div>
                                     </div>
                                     <div class="flex flex-col gap-1">
                                         <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Upload Date</label>
@@ -257,6 +264,17 @@
                 }
                 container.appendChild(wrapper);
             });
+        }
+
+        // Intercepts input actions to cache physical file configurations temporarily before execution
+        function queueSspmFile(event, rank, index) {
+            const file = event.target.files[0];
+            if (file) {
+                pendingFiles[rank] = file;
+                mapData[index].has_mutated = true;
+                document.getElementById(`status-${rank}`).textContent = `✓ Chosen (${file.name})`;
+                document.getElementById(`status-${rank}`).className = "text-xs text-emerald-400 font-medium truncate max-w-[200px]";
+            }
         }
 
         function initOnlineTracker() {
@@ -336,14 +354,38 @@
 
                 for (let map of mapData) {
                     if (map.has_mutated) {
+                        // 1. Process bucket file attachments first if an upload was staged
+                        if (pendingFiles[map.rank]) {
+                            const fileObj = pendingFiles[map.rank];
+                            const fileExt = fileObj.name.split('.').pop();
+                            const path = `maps/rank_${map.rank}_${Date.now()}.${fileExt}`;
+                            
+                            const { data: uploadData, error: uploadError } = await supabaseClient
+                                .storage
+                                .from('sspm-files')
+                                .upload(path, fileObj, { upsert: true });
+
+                            if (uploadError) {
+                                console.error(`Error uploading sspm for rank ${map.rank}:`, uploadError.message);
+                            } else {
+                                const { data: urlData } = supabaseClient
+                                    .storage
+                                    .from('sspm-files')
+                                    .getPublicUrl(path);
+                                map.sspmUrl = urlData.publicUrl;
+                            }
+                        }
+
+                        // 2. Perform table write updates
                         delete map.has_mutated;
                         const { error } = await supabaseClient
                             .from('maps')
                             .upsert(map);
-                        if (error) console.error("Database error:", error.message);
+                        if (error) console.error("Database table write rejected:", error.message);
                     }
                 }
 
+                pendingFiles = {}; // Flush runtime cache matrix once mutations execute successfully
                 isEditing = false;
                 btn.disabled = false;
                 btn.textContent = "Edit List";
