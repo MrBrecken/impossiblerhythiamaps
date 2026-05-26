@@ -27,34 +27,34 @@
 </head>
 <body class="bg-brand-bg text-gray-100 antialiased font-sans">
 
-    <header class="sticky top-0 z-50 bg-brand-bg/95 border-b border-brand-border backdrop-blur-md px-10 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-            <img src="rhythia-steam-removebg-preview.png" alt="Rhythia Logo" class="w-10 h-auto">
-            <h1 class="text-xl font-bold uppercase tracking-widest text-white">Impossible Rhythia Maps List</h1>
+    <header class="sticky top-0 z-50 bg-brand-bg/95 border-b border-brand-border backdrop-blur-md px-4 md:px-10 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+            <img src="rhythia-steam-removebg-preview.png" alt="Rhythia Logo" class="w-8 md:w-10 h-auto">
+            <h1 class="text-base md:text-xl font-bold uppercase tracking-widest text-white text-center sm:text-left">Impossible Rhythia Maps List</h1>
         </div>
         
-        <div class="flex items-center gap-4">
-            <button id="admin-action-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded border border-red-500 transition-colors">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
+            <button id="admin-action-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-bold text-xs md:text-sm px-3 md:px-4 py-2 rounded border border-red-500 transition-colors whitespace-nowrap">
                 Edit List
             </button>
             <div id="auth-section" class="relative">
-                <button id="login-button" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold text-sm px-5 py-2 rounded transition-colors flex items-center gap-2">
+                <button id="login-button" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold text-xs md:text-sm px-4 md:px-5 py-2 rounded transition-colors flex items-center gap-2 whitespace-nowrap">
                     Login with Discord
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1500px] mx-auto px-10 py-10 flex gap-8 justify-center items-start">
-        <div id="map-list" class="flex-1 max-w-[1000px] flex flex-col gap-4">
+    <main class="max-w-[1500px] mx-auto px-4 md:px-10 py-6 md:py-10 flex flex-col-reverse lg:flex-row gap-6 md:gap-8 justify-center items-start">
+        <div id="map-list" class="w-full flex-1 max-w-[1000px] flex flex-col gap-4">
             </div>
         
-        <aside class="w-80 shrink-0 sticky top-24">
+        <aside class="w-full lg:w-80 shrink-0 lg:sticky lg:top-24">
             <div class="bg-brand-surface border border-brand-border rounded-lg overflow-hidden">
                 <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider text-center py-3 bg-black/20 border-b border-brand-border">
                     Online Users
                 </div>
-                <div class="h-64 overflow-y-auto divide-y divide-brand-border" id="ticker-container">
+                <div class="h-32 lg:h-64 overflow-y-auto divide-y divide-brand-border" id="ticker-container">
                     </div>
             </div>
         </aside>
@@ -143,29 +143,33 @@
                 if (!isEditing) {
                     wrapper.innerHTML = `
                         <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
-                        <div class="flex items-center justify-between p-6 cursor-pointer select-none relative z-10 w-full" onclick="togglePanel(${map.rank})">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-6 cursor-pointer select-none relative z-10 w-full gap-4" onclick="togglePanel(${map.rank})">
                             <div class="flex flex-col gap-1">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xl font-black text-brand-accent tracking-tight">#${map.rank}</span>
-                                    <span class="text-lg font-bold text-white tracking-wide">${map.name}</span>
-                                    <span class="text-[10px] font-bold text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-2 py-0.5 rounded uppercase tracking-wider">.SSPM</span>
+                                <div class="flex items-wrap items-center gap-2 md:gap-3">
+                                    <span class="text-lg md:text-xl font-black text-brand-accent tracking-tight">#${map.rank}</span>
+                                    <span class="text-base md:text-lg font-bold text-white tracking-wide truncate max-w-[200px] sm:max-w-none">${map.name}</span>
+                                    <span class="text-[9px] font-bold text-brand-accent bg-brand-accent/10 border border-brand-accent/20 px-1.5 py-0.5 rounded uppercase tracking-wider">.SSPM</span>
                                 </div>
-                                <div class="text-sm text-brand-muted">by <span class="text-neutral-200 font-medium">${map.creator}</span></div>
-                                <div class="mt-2"><span class="text-[11px] font-semibold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase tracking-wider">${map.pattern || 'Map Pattern'}</span></div>
+                                <div class="text-xs md:text-sm text-brand-muted">by <span class="text-neutral-200 font-medium">${map.creator}</span></div>
+                                <div class="mt-1"><span class="text-[10px] font-semibold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded uppercase tracking-wider">${map.pattern || 'Map Pattern'}</span></div>
                             </div>
-                            <div class="flex flex-col items-end text-right">
-                                <div class="text-lg font-bold text-white">${map.starsCount}</div>
-                                <div class="text-sm text-brand-muted font-medium">${map.length}</div>
-                                <div class="text-sm font-bold text-emerald-400 mt-1">${map.stars} rp</div>
-                                <span class="text-[11px] text-brand-muted uppercase tracking-wider mt-2 font-semibold">${openPanels[map.rank] ? 'Close Details ▲' : 'Open Details ▼'}</span>
+                            <div class="flex sm:flex-col items-between sm:items-end justify-between sm:text-right border-t sm:border-t-0 border-brand-border/40 pt-3 sm:pt-0">
+                                <div class="flex flex-col sm:items-end">
+                                    <div class="text-base md:text-lg font-bold text-white">${map.starsCount}</div>
+                                    <div class="text-xs md:text-sm text-brand-muted font-medium">${map.length}</div>
+                                </div>
+                                <div class="flex flex-col items-end justify-end">
+                                    <div class="text-sm font-bold text-emerald-400">${map.stars} rp</div>
+                                    <span class="text-[10px] text-brand-accent uppercase tracking-wider mt-1 font-semibold">${openPanels[map.rank] ? 'Close Details ▲' : 'Open Details ▼'}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="${isPanelOpen} border-t border-brand-border bg-brand-panel/90 backdrop-blur-sm p-6 gap-6 relative z-10" id="panel-${map.rank}">
-                            <div class="flex-1 max-w-[500px] aspect-video bg-black rounded-md overflow-hidden border border-brand-border">
+                        <div class="${isPanelOpen} border-t border-brand-border bg-brand-panel/90 backdrop-blur-sm p-4 md:p-6 flex-col lg:flex-row gap-4 md:gap-6 relative z-10" id="panel-${map.rank}">
+                            <div class="w-full lg:flex-1 lg:max-w-[500px] aspect-video bg-black rounded-md overflow-hidden border border-brand-border">
                                 <iframe src="${videoEmbedUrl}" class="w-full h-full border-0" allowfullscreen></iframe>
                             </div>
-                            <div class="flex-1 flex flex-col gap-4">
-                                <div class="bg-brand-surface border border-brand-border rounded-md p-4 flex flex-col gap-2 text-sm">
+                            <div class="w-full lg:flex-1 flex flex-col gap-4">
+                                <div class="bg-brand-surface border border-brand-border rounded-md p-4 flex flex-col gap-2 text-xs md:text-sm">
                                     <div class="flex justify-between border-b border-brand-border pb-2">
                                         <span class="text-brand-muted">Map Download</span>
                                         ${map.sspmUrl && map.sspmUrl !== '#' 
@@ -190,75 +194,75 @@
                                         <a href="${map.onlineLink || '#'}" target="_blank" class="text-brand-accent hover:underline font-semibold">Link</a>
                                     </div>
                                 </div>
-                                <div class="bg-brand-surface border border-brand-border rounded-md px-4 py-3 flex justify-between items-center text-sm">
+                                <div class="bg-brand-surface border border-brand-border rounded-md px-4 py-3 flex justify-between items-center text-xs md:text-sm">
                                     <span class="font-bold text-white tracking-wide">Records</span>
-                                    <span class="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full uppercase tracking-wider">Uncleared</span>
+                                    <span class="text-[10px] md:text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">Uncleared</span>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else {
-                    const statusText = pendingFiles[map.rank] ? `✓ File Selected (${pendingFiles[map.rank].name})` : (map.sspmUrl && map.sspmUrl !== '#' ? '✓ File Stored' : 'No file chosen');
+                    const statusText = pendingFiles[map.rank] ? `✓ Selected (${pendingFiles[map.rank].name})` : (map.sspmUrl && map.sspmUrl !== '#' ? '✓ Stored' : 'No file');
                     
                     wrapper.innerHTML = `
                         <div class="absolute inset-0 pointer-events-none z-0" style="${bgStyle}"></div>
-                        <div class="p-6 bg-brand-surface/95 backdrop-blur-sm relative z-10 h-full w-full">
-                            <div class="flex gap-6 w-full">
+                        <div class="p-4 md:p-6 bg-brand-surface/95 backdrop-blur-sm relative z-10 h-full w-full">
+                            <div class="flex flex-col md:flex-row gap-6 w-full">
                                 <div class="flex-1 flex flex-col gap-3">
-                                    <div class="text-sm font-bold text-brand-accent mb-1 flex items-center justify-between">
-                                        <span>Rank #${map.rank} Core Configuration</span>
-                                        <label class="text-xs bg-neutral-800 hover:bg-neutral-700 text-gray-200 px-3 py-1 rounded border border-brand-border cursor-pointer transition-colors">
-                                            Upload Background
+                                    <div class="text-sm font-bold text-brand-accent mb-1 flex items-center justify-between gap-2">
+                                        <span>Rank #${map.rank} Core</span>
+                                        <label class="text-[10px] bg-neutral-800 hover:bg-neutral-700 text-gray-200 px-2 py-1 rounded border border-brand-border cursor-pointer transition-colors whitespace-nowrap">
+                                            Upload BG
                                             <input type="file" class="hidden" accept="image/*" onchange="updateItemBanner(event, ${index})">
                                         </label>
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map Title</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Map Title</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.name}" onchange="updateItemData(${index}, 'name', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Creator Name</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Creator Name</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.creator}" onchange="updateItemData(${index}, 'creator', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map File (.SSPM)</label>
-                                        <div class="flex items-center gap-3">
-                                            <label class="text-xs bg-brand-accent hover:bg-opacity-80 text-neutral-950 font-bold px-3 py-1.5 rounded cursor-pointer transition-all">
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Map File (.SSPM)</label>
+                                        <div class="flex items-center gap-2">
+                                            <label class="text-[10px] bg-brand-accent hover:bg-opacity-80 text-neutral-950 font-bold px-2.5 py-1.5 rounded cursor-pointer transition-all whitespace-nowrap">
                                                 Choose File
                                                 <input type="file" class="hidden" accept=".sspm" onchange="queueSspmFile(event, ${map.rank}, ${index})">
                                             </label>
-                                            <span class="text-xs ${pendingFiles[map.rank] ? 'text-emerald-400' : 'text-brand-muted'} font-medium truncate max-w-[200px]" id="status-${map.rank}">${statusText}</span>
+                                            <span class="text-xs ${pendingFiles[map.rank] ? 'text-emerald-400' : 'text-brand-muted'} font-medium truncate max-w-[120px]" id="status-${map.rank}">${statusText}</span>
                                         </div>
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Upload Date</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Upload Date</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.uploadDate || ''}" onchange="updateItemData(${index}, 'uploadDate', this.value)">
                                     </div>
                                 </div>
                                 <div class="flex-1 flex flex-col gap-3">
-                                    <div class="text-sm font-bold text-brand-accent mb-1">Panel Dropdown Settings</div>
+                                    <div class="text-sm font-bold text-brand-accent mb-1">Dropdown Configuration</div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Map Pattern Badge Text</label>
-                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.pattern || 'Map Pattern'}" placeholder="e.g., Alignments & Jumps" onchange="updateItemData(${index}, 'pattern', this.value)">
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Pattern Badge Text</label>
+                                        <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.pattern || 'Map Pattern'}" onchange="updateItemData(${index}, 'pattern', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">YouTube URL</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">YouTube URL</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.youtubeUrl || ''}" onchange="updateItemData(${index}, 'youtubeUrl', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Online Web Link</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Online Link</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.onlineLink || ''}" onchange="updateItemData(${index}, 'onlineLink', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Display Stars</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Display Stars</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.starsCount}" onchange="updateItemData(${index}, 'starsCount', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">Duration Length</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Duration Length</label>
                                         <input type="text" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.length}" onchange="updateItemData(${index}, 'length', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <label class="text-xs font-bold text-brand-muted uppercase tracking-wider">List RP Points</label>
+                                        <label class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">List RP Points</label>
                                         <input type="number" class="w-full bg-neutral-900 border border-brand-border text-white px-3 py-1.5 rounded text-sm focus:outline-none focus:border-brand-accent" value="${map.stars}" onchange="updateItemData(${index}, 'stars', this.value)">
                                     </div>
                                 </div>
@@ -276,7 +280,7 @@
                 pendingFiles[rank] = file;
                 mapData[index].has_mutated = true;
                 document.getElementById(`status-${rank}`).textContent = `✓ Chosen (${file.name})`;
-                document.getElementById(`status-${rank}`).className = "text-xs text-emerald-400 font-medium truncate max-w-[200px]";
+                document.getElementById(`status-${rank}`).className = "text-xs text-emerald-400 font-medium truncate max-w-[120px]";
             }
         }
 
@@ -306,9 +310,9 @@
                     const avatarMeta = (presenceEntries && presenceEntries[0]) ? presenceEntries[0].avatar_url : "https://cdn.discordapp.com/embed/avatars/0.png";
 
                     const el = document.createElement('div');
-                    el.className = 'flex items-center gap-3 px-4 py-3 text-sm font-semibold text-white';
+                    el.className = 'flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-white';
                     el.innerHTML = `
-                        <img src="${avatarMeta}" class="w-7 h-7 rounded-full object-cover border border-brand-border bg-neutral-950" alt="PFP">
+                        <img src="${avatarMeta}" class="w-6 h-6 rounded-full object-cover border border-brand-border bg-neutral-950" alt="PFP">
                         <span class="truncate">${userKey}</span>
                     `;
                     ticker.appendChild(el);
@@ -349,7 +353,7 @@
             if (!isEditing) {
                 isEditing = true;
                 btn.textContent = "Sync Changes Globally";
-                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-4 py-2 rounded border border-emerald-500 transition-colors";
+                btn.className = "bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs md:text-sm px-3 md:px-4 py-2 rounded border border-emerald-500 transition-colors whitespace-nowrap";
                 renderList();
             } else {
                 btn.textContent = "Saving...";
@@ -390,7 +394,7 @@
                 isEditing = false;
                 btn.disabled = false;
                 btn.textContent = "Edit List";
-                btn.className = "bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded border border-red-500 transition-colors";
+                btn.className = "bg-red-600 hover:bg-red-700 text-white font-bold text-xs md:text-sm px-3 md:px-4 py-2 rounded border border-red-500 transition-colors whitespace-nowrap";
                 renderList();
             }
         }
@@ -400,6 +404,7 @@
             const accessToken = fragment.get('access_token');
             if (accessToken) {
                 localStorage.setItem('discord_token', accessToken);
+                // CLEAN REFRESH FIX: Replaces hash parameters in-place without triggering full window reloads
                 window.history.replaceState({}, document.title, window.location.pathname);
                 fetchDiscordUserData(accessToken);
             }
@@ -412,7 +417,6 @@
                     const user = await response.json();
                     localStorage.setItem('user_profile', JSON.stringify(user));
                     renderProfile(user);
-                    window.location.reload();
                 } else { logout(); }
             } catch (e) { console.error(e); }
         }
@@ -427,12 +431,12 @@
             const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
             authSection.innerHTML = `
-                <div class="flex items-center gap-3 bg-brand-surface border border-brand-border px-4 py-1.5 rounded-full cursor-pointer hover:bg-neutral-800 transition-colors" id="profile-toggle">
-                    <img src="${avatarUrl}" class="w-7 h-7 rounded-full object-cover" alt="PFP">
-                    <span class="text-sm font-semibold text-white">${user.username}</span>
+                <div class="flex items-center gap-2 bg-brand-surface border border-brand-border px-3 py-1.5 rounded-full cursor-pointer hover:bg-neutral-800 transition-colors" id="profile-toggle">
+                    <img src="${avatarUrl}" class="w-6 h-6 rounded-full object-cover" alt="PFP">
+                    <span class="text-xs font-semibold text-white truncate max-w-[80px] sm:max-w-none">${user.username}</span>
                 </div>
-                <div class="hidden absolute top-12 right-0 bg-brand-surface border border-brand-border rounded shadow-xl overflow-hidden w-36" id="dropdown-menu">
-                    <button class="w-full text-left px-4 py-2.5 text-sm font-bold text-red-400 hover:bg-neutral-800 transition-colors" id="logout-button">Log Out</button>
+                <div class="hidden absolute top-12 right-0 bg-brand-surface border border-brand-border rounded shadow-xl overflow-hidden w-32 z-50" id="dropdown-menu">
+                    <button class="w-full text-left px-4 py-2 text-xs font-bold text-red-400 hover:bg-neutral-800 transition-colors" id="logout-button">Log Out</button>
                 </div>
             `;
 
@@ -448,11 +452,6 @@
                 adminBtn.addEventListener('click', toggleEditMode);
             }
         }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const scrollbox = document.getElementById('ticker-container');
-            if(scrollbox) scrollbox.style.height = "320px";
-        });
 
         function logout() { localStorage.clear(); window.location.reload(); }
 
@@ -470,7 +469,7 @@
                     youtubeUrl: "https://www.youtube.com/watch?v=4RCWHNyPGeE",
                     uploadDate: "8/23/2026",
                     onlineLink: "#",
-                    pattern: "Map Pattern" // Default value added to fallback loops seamlessly
+                    pattern: "Map Pattern" 
                 });
             }
             renderList();
